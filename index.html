@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vac Attack</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#16213E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  :root{
+    --ink:#16213E; --ink-soft:#3A4A6B; --parchment:#FAF7F0; --card:#FFFFFF;
+    --rust:#A6402D; --rust-bg:#F7E7E3; --sage:#4F7358; --sage-bg:#E6EFE7;
+    --brass:#B08D57; --brass-bg:#F3EBDC; --line:#DDD6C7; --text:#26241F; --text-soft:#6B675C;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--parchment);color:var(--text);}
+  .app{max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:4.5rem;position:relative;}
+  h1,h2,h3{font-family:Georgia,serif;}
+  .header{padding:1.2rem 1.1rem .9rem;border-bottom:2px solid var(--ink);display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;position:sticky;top:0;background:var(--parchment);z-index:20;}
+  .header h1{margin:0;font-size:1.25rem;font-weight:600;color:var(--ink);}
+  .header p{margin:.2rem 0 0;color:var(--text-soft);font-size:.78rem;}
+  .lock-btn{background:none;border:1.5px solid var(--ink);border-radius:20px;padding:.3rem .65rem;font-size:.72rem;color:var(--ink);cursor:pointer;white-space:nowrap;}
+  .lock-btn.unlocked{background:var(--brass);border-color:var(--brass);color:#fff;}
+  main{padding:1rem;}
+  .section-title{font-size:1.05rem;color:var(--ink);margin:0 0 .75rem;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:.75rem;}
+  .btn{background:var(--ink);color:#fff;border:none;border-radius:6px;padding:.55rem 1rem;font-size:.85rem;cursor:pointer;font-family:inherit;}
+  .btn:hover{background:var(--ink-soft);}
+  .btn.secondary{background:transparent;color:var(--ink);border:1.5px solid var(--ink);}
+  .btn.danger{background:transparent;color:var(--rust);border:1.5px solid var(--rust);}
+  .btn.small{padding:.35rem .65rem;font-size:.78rem;}
+  .btn.full{width:100%;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-bottom:.75rem;}
+  .firm-row{display:flex;align-items:center;gap:.7rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.75rem .9rem;margin-bottom:.55rem;cursor:pointer;}
+  .firm-row-main{flex:1;min-width:0;}
+  .firm-row-name{font-weight:600;color:var(--ink);font-size:.98rem;margin:0;}
+  .firm-row-sub{font-size:.76rem;color:var(--text-soft);margin:.15rem 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .star-btn{background:none;border:none;font-size:1.35rem;cursor:pointer;color:var(--line);line-height:1;padding:.1rem;flex-shrink:0;}
+  .star-btn.active{color:var(--brass);}
+  .chevron{color:var(--text-soft);font-size:1.1rem;flex-shrink:0;}
+  .stamp{font-family:Georgia,serif;font-weight:700;font-size:.65rem;letter-spacing:1px;padding:.2rem .5rem;border:1.5px solid currentColor;border-radius:4px;white-space:nowrap;text-transform:uppercase;display:inline-block;}
+  .stamp.open{color:var(--sage);background:var(--sage-bg);}
+  .stamp.soon{color:var(--brass);background:var(--brass-bg);}
+  .stamp.closed{color:var(--rust);background:var(--rust-bg);}
+  .stamp.tba{color:var(--text-soft);background:#EFEDE6;}
+  .stamp-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.4rem;}
+  .descriptor-grid dt{color:var(--text-soft);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.4px;margin:.7rem 0 0;}
+  .descriptor-grid dd{margin:.15rem 0 0;line-height:1.45;font-size:.88rem;}
+  .empty{text-align:center;padding:2rem 1rem;color:var(--text-soft);border:1.5px dashed var(--line);border-radius:10px;font-size:.88rem;}
+  .empty p{margin:.3rem 0;}
+  label{display:block;font-size:.72rem;font-weight:600;color:var(--ink-soft);margin:.65rem 0 .2rem;text-transform:uppercase;letter-spacing:.3px;}
+  input[type=text],input[type=date],input[type=url],input[type=email],input[type=password],textarea,select{
+    width:100%;padding:.5rem .6rem;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:.9rem;background:#fff;color:var(--text);
+  }
+  textarea{min-height:55px;resize:vertical;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 .8rem;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(22,33,62,.55);display:flex;align-items:flex-start;justify-content:center;padding:1.2rem .8rem;overflow-y:auto;z-index:60;}
+  .modal{background:var(--parchment);border-radius:12px;max-width:410px;width:100%;padding:1.2rem 1.1rem 1.4rem;border:1px solid var(--line);position:relative;}
+  .modal h2{margin:0 0 .2rem;color:var(--ink);font-size:1.15rem;}
+  .modal-close{position:absolute;top:.8rem;right:.9rem;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text-soft);}
+  .helper{font-size:.76rem;color:var(--text-soft);margin:0 0 .75rem;line-height:1.4;}
+  .qa-item,.custom-field-row{display:flex;gap:.4rem;align-items:center;margin-bottom:.35rem;}
+  .qa-item input,.custom-field-row input{margin:0;}
+  .back-btn{background:none;border:none;color:var(--ink);font-size:.85rem;cursor:pointer;padding:0;margin-bottom:.8rem;display:flex;align-items:center;gap:.3rem;}
+  .detail-title{display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;margin-bottom:.2rem;}
+  .detail-title h2{margin:0;font-size:1.25rem;color:var(--ink);}
+  .offices-line{font-size:.8rem;color:var(--text-soft);margin:.2rem 0 0;}
+  .news-item{padding:.55rem 0;border-bottom:1px solid var(--line);}
+  .news-item:last-child{border-bottom:none;}
+  .news-date{font-size:.7rem;color:var(--text-soft);text-transform:uppercase;letter-spacing:.3px;}
+  .news-headline{font-size:.88rem;margin:.15rem 0 0;}
+  .notes-box{background:var(--brass-bg);border:1px solid var(--brass);border-radius:10px;padding:.85rem 1rem;margin-top:.9rem;}
+  .notes-box h3{margin:0 0 .3rem;color:#6B4E24;font-size:.95rem;}
+  .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--ink);display:flex;justify-content:space-around;padding:.4rem .2rem calc(.4rem + env(safe-area-inset-bottom));z-index:30;}
+  .nav-btn{background:none;border:none;color:#9FAAC7;display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.65rem;padding:.3rem .4rem;cursor:pointer;font-family:inherit;flex:1;}
+  .nav-btn .ic{font-size:1.15rem;}
+  .nav-btn.active{color:#fff;}
+  .event-card{border-left:3px solid var(--brass);}
+  .event-date{font-weight:600;color:var(--ink);font-size:.85rem;}
+  .event-type{font-size:.68rem;text-transform:uppercase;letter-spacing:.4px;color:var(--brass);font-weight:700;}
+  .exam-row{display:flex;justify-content:space-between;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--line);}
+  .exam-row:last-child{border-bottom:none;}
+  .exam-date{font-weight:600;color:var(--ink);min-width:95px;font-size:.85rem;}
+  .add-inline{display:flex;gap:.4rem;margin-top:.7rem;flex-wrap:wrap;}
+  .add-inline input{flex:1;min-width:110px;margin:0;}
+  .dashboard-item{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--line);}
+  .dashboard-item:last-child{border-bottom:none;}
+  .dash-label{font-weight:600;color:var(--ink);font-size:.88rem;}
+  .dash-sub{font-size:.75rem;color:var(--text-soft);}
+  .toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:.55rem 1rem;border-radius:8px;font-size:.82rem;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;text-align:center;}
+  .toast.show{opacity:1;}
+  .loading-state{padding:2rem;text-align:center;color:var(--text-soft);}
+  .source-note{font-size:.72rem;color:var(--text-soft);text-align:center;margin-top:1.5rem;line-height:1.5;}
+  .auth-screen{padding:2.5rem 1.5rem;max-width:360px;margin:0 auto;}
+  .auth-screen h1{color:var(--ink);font-size:1.6rem;margin:0 0 .3rem;text-align:center;}
+  .auth-screen p.tag{text-align:center;color:var(--text-soft);font-size:.85rem;margin:0 0 2rem;}
+  .auth-toggle{display:flex;gap:.5rem;margin-top:1.2rem;}
+  .auth-toggle button{flex:1;}
+  .error-text{color:var(--rust);font-size:.8rem;margin-top:.5rem;}
+</style>
+</head>
+<body>
+  <div id="root"><div class="loading-state">Loading Vac Attack…</div></div>
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+    }
+  </script>
+</body>
+</html>
