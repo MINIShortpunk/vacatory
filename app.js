@@ -1,56 +1,61 @@
-/* ==================================
-   VacAttack
-   app.js
-================================== */
+// =====================================
+// VacAttack
+// app.js
+// =====================================
 
 document.addEventListener("DOMContentLoaded", () => {
+    loadFirms();
+});
 
-    console.log("VacAttack Loaded");
+async function loadFirms() {
 
-    const cards = document.querySelectorAll(".card");
+    const firmsContainer = document.getElementById("firms");
 
-    cards.forEach(card => {
+    firmsContainer.innerHTML = "<p>Loading firms...</p>";
 
-        card.addEventListener("click", () => {
+    const { data, error } = await supabase
+        .from("firms")
+        .select("*")
+        .order("uk_rank", { ascending: true });
 
-            const title = card.querySelector("h3").innerText;
+    if (error) {
+        console.error(error);
 
-            switch (title) {
+        firmsContainer.innerHTML = `
+            <p>Unable to load firms.</p>
+        `;
 
-                case "🏢 Law Firms":
-                    alert("Law Firms page coming next.");
-                    break;
+        return;
+    }
 
-                case "📅 Deadlines":
-                    alert("Deadlines page coming next.");
-                    break;
+    if (!data || data.length === 0) {
+        firmsContainer.innerHTML = `
+            <p>No firms found.</p>
+        `;
 
-                case "📰 Commercial Awareness":
-                    alert("Commercial Awareness page coming next.");
-                    break;
+        return;
+    }
 
-                case "⭐ Favourites":
-                    alert("Favourites page coming next.");
-                    break;
+    firmsContainer.innerHTML = "";
 
-                case "📝 My Notes":
-                    alert("Notes page coming next.");
-                    break;
+    data.forEach(firm => {
 
-                case "☕ Keep VacAttack Free":
-                    window.open(
-                        "https://buymeacoffee.com/",
-                        "_blank"
-                    );
-                    break;
+        const card = document.createElement("div");
 
-                default:
-                    console.log(title);
+        card.className = "card";
 
-            }
+        card.innerHTML = `
+            <h3>${firm.name}</h3>
 
-        });
+            <p><strong>Rank:</strong> ${firm.uk_rank ?? "-"}</p>
+
+            <p><strong>Type:</strong> ${firm.firm_type ?? "-"}</p>
+
+            <p><strong>Head Office:</strong> ${firm.head_office ?? "-"}</p>
+        `;
+
+        firmsContainer.appendChild(card);
 
     });
 
-});
+}
