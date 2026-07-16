@@ -1,0 +1,56 @@
+{
+  "id": 1,
+  "name": "A&O Shearman",
+  "shortName": "A&O",
+  "logo": "",
+  "ukRank": 1,
+  "firmType": "Magic Circle",
+  "overview": "",
+
+  "headOffice": "London",
+
+  "locations": {
+    "uk": [],
+    "international": []
+  },
+
+  "practiceAreas": [],
+
+  "vacationSchemes": {
+    "spring": {},
+    "summer": {},
+    "winter": {},
+    "openDays": {},
+    "insightDays": {}
+  },
+
+  "trainingContract": {},
+
+  "applicationProcess": [],
+
+  "salary": {
+    "vacationScheme": "",
+    "trainee": "",
+    "nq": ""
+  },
+
+  "diversity": {},
+
+  "sustainability": {},
+
+  "commercialAwareness": [],
+
+  "deadlines": [],
+
+  "links": {
+    "website": "",
+    "careers": "",
+    "linkedin": ""
+  },
+
+  "favourite": false,
+
+  "notes": "",
+
+  "lastUpdated": ""
+}
