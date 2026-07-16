@@ -1,5 +1,7 @@
--- Vac Attack database setup.
--- Paste this whole file into Supabase's SQL editor and click Run, once.
+-- ======================================
+-- Vacatory Database Setup
+-- ======================================
+-- Paste this whole file into Supabase's SQL editor and click Run once.
 
 create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
