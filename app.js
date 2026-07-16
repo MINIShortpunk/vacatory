@@ -1,7 +1,7 @@
-// =====================================
+// ======================================
 // VacAttack
 // app.js
-// =====================================
+// ======================================
 
 document.addEventListener("DOMContentLoaded", () => {
     loadFirms();
@@ -11,50 +11,44 @@ async function loadFirms() {
 
     const firmsContainer = document.getElementById("firms");
 
-    firmsContainer.innerHTML = "<p>Loading firms...</p>";
+    firmsContainer.innerHTML = "Loading firms...";
 
-    const { data, error } = await supabase
+    const { data, error } = await client
         .from("firms")
         .select("*")
         .order("uk_rank", { ascending: true });
 
     if (error) {
+
         console.error(error);
 
-        firmsContainer.innerHTML = `
-            <p>Unable to load firms.</p>
-        `;
+        firmsContainer.innerHTML =
+            "Unable to load firms.";
 
         return;
+
     }
 
-    if (!data || data.length === 0) {
-        firmsContainer.innerHTML = `
-            <p>No firms found.</p>
-        `;
+    if (data.length === 0) {
+
+        firmsContainer.innerHTML =
+            "No firms found.";
 
         return;
+
     }
 
     firmsContainer.innerHTML = "";
 
     data.forEach(firm => {
 
-        const card = document.createElement("div");
-
-        card.className = "card";
-
-        card.innerHTML = `
-            <h3>${firm.name}</h3>
-
-            <p><strong>Rank:</strong> ${firm.uk_rank ?? "-"}</p>
-
-            <p><strong>Type:</strong> ${firm.firm_type ?? "-"}</p>
-
-            <p><strong>Head Office:</strong> ${firm.head_office ?? "-"}</p>
+        firmsContainer.innerHTML += `
+            <div class="card">
+                <h3>${firm.name}</h3>
+                <p>${firm.firm_type}</p>
+                <p>${firm.head_office}</p>
+            </div>
         `;
-
-        firmsContainer.appendChild(card);
 
     });
 
