@@ -3,17 +3,17 @@
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>VacAttack</title>
+<title>VacAttack</title>
 
-    <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 </head>
 
@@ -21,49 +21,159 @@
 
 <header>
 
-    <div class="logo">
-        <h1>VacAttack</h1>
-    </div>
+<div class="logo">
 
-    <nav>
-        <a href="#">Home</a>
-        <a href="#">Law Firms</a>
-        <a href="#">Deadlines</a>
-        <a href="#">Commercial Awareness</a>
-        <a href="#">Profile</a>
-    </nav>
+<h1>VacAttack</h1>
+
+</div>
+
+<nav>
+
+<a href="#">Home</a>
+<a href="#">Law Firms</a>
+<a href="#">Deadlines</a>
+<a href="#">Commercial Awareness</a>
+<a href="#">Profile</a>
+
+</nav>
 
 </header>
 
-<main>
 
 <section class="hero">
 
-    <p class="tag">
-        Built by a law student, for law students.
-    </p>
+<p class="tag">
 
-    <h2>
-        Helping every aspiring lawyer secure a vacation scheme.
-    </h2>
+Built by a law student, for law students.
 
-    <p>
-        Everything you need in one place.
-    </p>
+</p>
+
+<h2>
+
+Helping every aspiring lawyer secure a vacation scheme.
+
+</h2>
+
+<p class="hero-text">
+
+Research firms, organise applications, track deadlines and stay commercially aware — all in one place.
+
+</p>
+
+<a class="hero-button" href="#firms-section">
+
+Browse Law Firms
+
+</a>
 
 </section>
 
-<section>
 
-    <h2>Law Firms</h2>
 
-    <div id="firms">
-        Loading firms...
-    </div>
+<section class="stats">
+
+<div class="stat">
+
+<h3>50+</h3>
+
+<p>UK Law Firms</p>
+
+</div>
+
+<div class="stat">
+
+<h3>Daily</h3>
+
+<p>Deadline Updates</p>
+
+</div>
+
+<div class="stat">
+
+<h3>Free</h3>
+
+<p>Always Free</p>
+
+</div>
 
 </section>
 
-</main>
+
+
+<section id="firms-section">
+
+<div class="section-header">
+
+<h2>
+
+Law Firms
+
+</h2>
+
+<input
+id="searchInput"
+type="text"
+placeholder="Search firms..."
+>
+
+</div>
+
+<div id="firms">
+
+Loading firms...
+
+</div>
+
+</section>
+
+
+
+<section class="coffee">
+
+<h2>
+
+☕ Keep VacAttack Free
+
+</h2>
+
+<p>
+
+VacAttack will always be free.
+
+If it helps you secure a vacation scheme or training contract and you'd like to support future development, I'd be incredibly grateful for a coffee.
+
+</p>
+
+<a
+class="coffee-button"
+href="https://buymeacoffee.com/"
+target="_blank">
+
+Buy Me a Coffee
+
+</a>
+
+</section>
+
+
+
+<footer>
+
+<p>
+
+© 2026 VacAttack
+
+</p>
+
+<p>
+
+Built with far too much caffeine.
+
+</p>
+
+</footer>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
