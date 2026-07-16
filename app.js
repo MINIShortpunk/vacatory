@@ -1,7 +1,7 @@
-// ======================================
-// VacAttack
+// =======================================
+// VacAttack v0.2
 // app.js
-// ======================================
+// =======================================
 
 let firms = [];
 
@@ -39,6 +39,9 @@ async function loadFirms() {
 
     firms = data || [];
 
+    document.getElementById("firmCount").textContent =
+        firms.length;
+
     displayFirms(firms);
 
 }
@@ -60,9 +63,11 @@ function displayFirms(list) {
 
     list.forEach(firm => {
 
-        container.innerHTML += `
+        const card = document.createElement("div");
 
-        <div class="firm-card">
+        card.className = "firm-card";
+
+        card.innerHTML = `
 
             <div class="firm-top">
 
@@ -98,11 +103,21 @@ function displayFirms(list) {
 
             </p>
 
+            <div class="practice-tags">
+
+                <span>Corporate</span>
+
+                <span>Finance</span>
+
+                <span>Litigation</span>
+
+            </div>
+
             <div class="firm-footer">
 
                 <span class="status">
 
-                    Active
+                    Applications Open
 
                 </span>
 
@@ -114,9 +129,17 @@ function displayFirms(list) {
 
             </div>
 
-        </div>
-
         `;
+
+        card.addEventListener("click", () => {
+
+            alert(
+                "Firm profile coming next."
+            );
+
+        });
+
+        container.appendChild(card);
 
     });
 
