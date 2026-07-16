@@ -1,5 +1,18 @@
+// ======================================
+// VacAttack
+// app.js
+// ======================================
+
+let firms = [];
+
 document.addEventListener("DOMContentLoaded", () => {
+
     loadFirms();
+
+    document
+        .getElementById("searchInput")
+        .addEventListener("input", searchFirms);
+
 });
 
 async function loadFirms() {
@@ -14,25 +27,42 @@ async function loadFirms() {
         .order("uk_rank", { ascending: true });
 
     if (error) {
+
         console.error(error);
-        container.innerHTML = "<p>Unable to load firms.</p>";
+
+        container.innerHTML =
+            "<p>Unable to load firms.</p>";
+
         return;
+
     }
 
-    if (!data || data.length === 0) {
-        container.innerHTML = "<p>No firms found.</p>";
+    firms = data || [];
+
+    displayFirms(firms);
+
+}
+
+function displayFirms(list) {
+
+    const container = document.getElementById("firms");
+
+    if (list.length === 0) {
+
+        container.innerHTML =
+            "<p>No firms found.</p>";
+
         return;
+
     }
 
     container.innerHTML = "";
 
-    data.forEach(firm => {
+    list.forEach(firm => {
 
-        const card = document.createElement("div");
+        container.innerHTML += `
 
-        card.className = "firm-card";
-
-        card.innerHTML = `
+        <div class="firm-card">
 
             <div class="firm-top">
 
@@ -58,13 +88,13 @@ async function loadFirms() {
 
             <p class="firm-type">
 
-                ${firm.firm_type}
+                ${firm.firm_type ?? ""}
 
             </p>
 
             <p class="firm-location">
 
-                📍 ${firm.head_office}
+                📍 ${firm.head_office ?? ""}
 
             </p>
 
@@ -72,7 +102,7 @@ async function loadFirms() {
 
                 <span class="status">
 
-                    Coming Soon
+                    Active
 
                 </span>
 
@@ -84,10 +114,41 @@ async function loadFirms() {
 
             </div>
 
+        </div>
+
         `;
 
-        container.appendChild(card);
-
     });
+
+}
+
+function searchFirms() {
+
+    const search = document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+    const filtered = firms.filter(firm =>
+
+        (firm.name || "")
+            .toLowerCase()
+            .includes(search)
+
+        ||
+
+        (firm.firm_type || "")
+            .toLowerCase()
+            .includes(search)
+
+        ||
+
+        (firm.head_office || "")
+            .toLowerCase()
+            .includes(search)
+
+    );
+
+    displayFirms(filtered);
 
 }
