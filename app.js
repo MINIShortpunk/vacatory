@@ -1,5 +1,5 @@
 // =======================================
-// Vacatory v0.2
+// Vacatory
 // app.js
 // =======================================
 
@@ -19,7 +19,7 @@ async function loadFirms() {
 
     const container = document.getElementById("firms");
 
-    container.innerHTML = "<p>Loading firms...</p>";
+    container.innerHTML = "<p class='loading'>Loading firms...</p>";
 
     const { data, error } = await client
         .from("firms")
@@ -31,7 +31,7 @@ async function loadFirms() {
         console.error(error);
 
         container.innerHTML =
-            "<p>Unable to load firms.</p>";
+            "<p class='loading'>Unable to load firms.</p>";
 
         return;
 
@@ -50,10 +50,10 @@ function displayFirms(list) {
 
     const container = document.getElementById("firms");
 
-    if (list.length === 0) {
+    if (!list.length) {
 
         container.innerHTML =
-            "<p>No firms found.</p>";
+            "<p class='loading'>No firms found.</p>";
 
         return;
 
@@ -69,73 +69,73 @@ function displayFirms(list) {
 
         card.innerHTML = `
 
-            <div class="firm-top">
+<div class="firm-card-header">
 
-                <div>
+    <div class="firm-logo">
 
-                    <h3>${firm.name}</h3>
+        ${firm.name ? firm.name.charAt(0) : "V"}
 
-                    <span class="rank">
+    </div>
 
-                        UK Rank #${firm.uk_rank ?? "-"}
+    <div class="firm-main">
 
-                    </span>
+        <h3>${firm.name}</h3>
 
-                </div>
+        <p class="firm-city">
 
-                <button class="star">
+            ${firm.head_office ?? "United Kingdom"}
 
-                    ☆
+        </p>
 
-                </button>
+    </div>
 
-            </div>
+    <button
+        class="star"
+        aria-label="Favourite">
 
-            <p class="firm-type">
+        ☆
 
-                ${firm.firm_type ?? ""}
+    </button>
 
-            </p>
+</div>
 
-            <p class="firm-location">
+<div class="firm-meta">
 
-                📍 ${firm.head_office ?? ""}
+    <span class="status-pill">
 
-            </p>
+        Applications Open
 
-            <div class="practice-tags">
+    </span>
 
-                <span>Corporate</span>
+    <span class="firm-rank">
 
-                <span>Finance</span>
+        UK #${firm.uk_rank ?? "-"}
 
-                <span>Litigation</span>
+    </span>
 
-            </div>
+</div>
 
-            <div class="firm-footer">
+<div class="firm-bottom">
 
-                <span class="status">
+    <span>
 
-                    Applications Open
+        ${firm.firm_type ?? "Commercial Law"}
 
-                </span>
+    </span>
 
-                <button class="view-button">
+    <span class="chevron">
 
-                    View Firm →
+        →
 
-                </button>
+    </span>
 
-            </div>
+</div>
 
-        `;
+`;
 
         card.addEventListener("click", () => {
 
-            alert(
-                "Firm profile coming next."
-            );
+            alert("Firm profile coming next.");
 
         });
 
@@ -144,13 +144,21 @@ function displayFirms(list) {
     });
 
 }
-
 function searchFirms() {
 
     const search = document
         .getElementById("searchInput")
         .value
+        .trim()
         .toLowerCase();
+
+    if (!search) {
+
+        displayFirms(firms);
+
+        return;
+
+    }
 
     const filtered = firms.filter(firm =>
 
@@ -168,6 +176,11 @@ function searchFirms() {
 
         (firm.head_office || "")
             .toLowerCase()
+            .includes(search)
+
+        ||
+
+        String(firm.uk_rank || "")
             .includes(search)
 
     );
