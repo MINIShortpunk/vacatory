@@ -4,6 +4,8 @@
 // =======================================
 
 let firms = [];
+let practiceAreasByFirm = new Map(); // firmId -> Set(practice_area)
+let rolesByFirm = new Map();         // firmId -> Set(role_name)
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -11,7 +13,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document
         .getElementById("searchInput")
-        .addEventListener("input", searchFirms);
+        .addEventListener("input", applyFilters);
+
+    ["filterPracticeArea", "filterRole", "filterFirmType"].forEach(id => {
+        document.getElementById(id).addEventListener("change", applyFilters);
+    });
+
+    document.getElementById("filterReset").addEventListener("click", () => {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("filterPracticeArea").value = "";
+        document.getElementById("filterRole").value = "";
+        document.getElementById("filterFirmType").value = "";
+        applyFilters();
+    });
 
 });
 
@@ -40,7 +54,70 @@ async function loadFirms() {
 
     firms = data || [];
 
+    await loadFilterData();
+    populateFilterOptions();
+
     displayFirms(firms);
+
+}
+
+async function loadFilterData() {
+
+    const firmIds = firms.map(f => f.id);
+    if (!firmIds.length) return;
+
+    const [paResult, roleResult] = await Promise.all([
+        client.from("practice_areas").select("firm_id, practice_area").in("firm_id", firmIds),
+        client.from("firm_roles").select("firm_id, role_name").in("firm_id", firmIds)
+    ]);
+
+    practiceAreasByFirm = new Map();
+    (paResult.data || []).forEach(row => {
+        if (!practiceAreasByFirm.has(row.firm_id)) practiceAreasByFirm.set(row.firm_id, new Set());
+        practiceAreasByFirm.get(row.firm_id).add(row.practice_area);
+    });
+
+    rolesByFirm = new Map();
+    (roleResult.data || []).forEach(row => {
+        if (!rolesByFirm.has(row.firm_id)) rolesByFirm.set(row.firm_id, new Set());
+        rolesByFirm.get(row.firm_id).add(row.role_name);
+    });
+
+}
+
+function populateFilterOptions() {
+
+    const allPracticeAreas = new Set();
+    practiceAreasByFirm.forEach(set => set.forEach(v => allPracticeAreas.add(v)));
+
+    const allRoles = new Set();
+    rolesByFirm.forEach(set => set.forEach(v => allRoles.add(v)));
+
+    const allFirmTypes = new Set(firms.map(f => f.firm_type).filter(Boolean));
+
+    fillSelect("filterPracticeArea", allPracticeAreas);
+    fillSelect("filterRole", allRoles);
+    fillSelect("filterFirmType", allFirmTypes);
+
+}
+
+function fillSelect(id, valuesSet) {
+
+    const select = document.getElementById(id);
+    const current = select.value;
+    const placeholder = select.options[0];
+
+    select.innerHTML = "";
+    select.appendChild(placeholder);
+
+    Array.from(valuesSet).sort().forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+    });
+
+    select.value = current;
 
 }
 
@@ -101,7 +178,7 @@ function displayFirms(list) {
 
 </div>
 
-<a href="#" class="firm-link">
+<a href="firm.html?id=${firm.id}" class="firm-link">
     View profile
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M5 12h14M13 6l6 6-6 6"></path>
@@ -122,9 +199,7 @@ function displayFirms(list) {
 
             if (e.target.closest(".star")) return;
 
-            if (e.target.closest(".firm-link")) e.preventDefault();
-
-            alert("Firm profile coming next.");
+            window.location.href = `firm.html?id=${firm.id}`;
 
         });
 
@@ -133,46 +208,36 @@ function displayFirms(list) {
     });
 
 }
-function searchFirms() {
+function applyFilters() {
 
-    const search = document
-        .getElementById("searchInput")
-        .value
-        .trim()
-        .toLowerCase();
+    const search = document.getElementById("searchInput").value.trim().toLowerCase();
+    const practiceArea = document.getElementById("filterPracticeArea").value;
+    const role = document.getElementById("filterRole").value;
+    const firmType = document.getElementById("filterFirmType").value;
 
-    if (!search) {
+    const filtered = firms.filter(firm => {
 
-        displayFirms(firms);
+        const matchesSearch = !search || (
+            (firm.name || "").toLowerCase().includes(search) ||
+            (firm.firm_type || "").toLowerCase().includes(search) ||
+            (firm.head_office || "").toLowerCase().includes(search) ||
+            String(firm.uk_rank || "").includes(search)
+        );
 
-        return;
+        const matchesPracticeArea = !practiceArea ||
+            (practiceAreasByFirm.get(firm.id) && practiceAreasByFirm.get(firm.id).has(practiceArea));
 
-    }
+        const matchesRole = !role ||
+            (rolesByFirm.get(firm.id) && rolesByFirm.get(firm.id).has(role));
 
-    const filtered = firms.filter(firm =>
+        const matchesFirmType = !firmType || firm.firm_type === firmType;
 
-        (firm.name || "")
-            .toLowerCase()
-            .includes(search)
+        return matchesSearch && matchesPracticeArea && matchesRole && matchesFirmType;
 
-        ||
+    });
 
-        (firm.firm_type || "")
-            .toLowerCase()
-            .includes(search)
-
-        ||
-
-        (firm.head_office || "")
-            .toLowerCase()
-            .includes(search)
-
-        ||
-
-        String(firm.uk_rank || "")
-            .includes(search)
-
-    );
+    const anyFilterActive = search || practiceArea || role || firmType;
+    document.getElementById("filterReset").classList.toggle("hidden", !anyFilterActive);
 
     displayFirms(filtered);
 
