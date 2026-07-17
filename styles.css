@@ -778,9 +778,9 @@ height:22px;
 }
 
 .profile-overview{
-max-width:720px;
+max-width:780px;
 font-size:1.05rem;
-line-height:1.6;
+line-height:1.65;
 margin-bottom:24px;
 }
 
@@ -812,26 +812,53 @@ height:15px;
 color:var(--accent);
 }
 
+.profile-tabs{
+position:sticky;
+top:73px;
+z-index:90;
+
+background:var(--tabs-bg);
+backdrop-filter:blur(16px);
+border-bottom:1px solid var(--border);
+margin-top:28px;
+}
+
+.profile-tabs-inner{
+display:flex;
+gap:6px;
+overflow-x:auto;
+}
+
+.tab-btn{
+padding:16px 18px;
+font-size:.92rem;
+font-weight:600;
+color:var(--text-light);
+white-space:nowrap;
+border-bottom:2px solid transparent;
+transition:.2s;
+}
+
+.tab-btn:hover{
+color:var(--text);
+}
+
+.tab-btn.active{
+color:var(--accent);
+border-bottom-color:var(--accent);
+}
+
 .profile-body{
 padding:36px 0 90px;
 }
 
-.profile-section{
-padding-top:44px;
-border-top:1px solid var(--border);
+.tab-panel{
+display:none;
+}
+
+.tab-panel.active{
+display:block;
 animation:fadeUp .4s ease both;
-}
-
-.profile-section:first-child{
-padding-top:0;
-border-top:none;
-}
-
-.profile-section h2{
-font-size:1.4rem;
-font-weight:700;
-letter-spacing:-.01em;
-margin:0 0 20px;
 }
 
 .profile-grid{
@@ -844,6 +871,14 @@ margin-bottom:24px;
 .profile-list{
 display:grid;
 gap:18px;
+}
+
+.tab-intro{
+font-size:.92rem;
+line-height:1.5;
+color:var(--text-light);
+max-width:62ch;
+margin:0 0 22px;
 }
 
 .profile-card{
@@ -963,6 +998,10 @@ flex-wrap:wrap;
 
 .profile-header-text h1{
 font-size:1.5rem;
+}
+
+.profile-tabs{
+top:0;
 }
 
 }

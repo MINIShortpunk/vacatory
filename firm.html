@@ -104,10 +104,21 @@ Back to Firms
 </div>
 </section>
 
+<nav class="profile-tabs" id="profileTabs">
+<div class="container profile-tabs-inner">
+<button class="tab-btn active" data-tab="overview">Overview</button>
+<button class="tab-btn" data-tab="practice-areas">Practice Areas</button>
+<button class="tab-btn" data-tab="roles">Roles</button>
+<button class="tab-btn" data-tab="locations">Locations</button>
+<button class="tab-btn" data-tab="vacation-schemes">Vacation Schemes</button>
+<button class="tab-btn" data-tab="training-contract">Training Contract</button>
+</div>
+</nav>
+
 <div class="container profile-body">
 
-<section class="profile-section" id="section-overview">
-<h2>Overview</h2>
+<section class="tab-panel active" id="tab-overview">
+<p class="tab-intro">Key facts about the firm at a glance — size, secondments, scholarships, and links to their website and careers page.</p>
 <div class="profile-grid">
 <div class="profile-card">
 <h3>Firm size</h3>
@@ -125,28 +136,28 @@ Back to Firms
 <div id="ov-links" class="profile-links"></div>
 </section>
 
-<section class="profile-section" id="section-practice-areas">
-<h2>Practice Areas</h2>
+<section class="tab-panel" id="tab-practice-areas">
+<p class="tab-intro">The legal specialisms this firm works in — useful for matching your interests to the right firm, and for interview prep.</p>
 <div id="practiceAreasList" class="profile-list"></div>
 </section>
 
-<section class="profile-section" id="section-roles">
-<h2>Roles</h2>
+<section class="tab-panel" id="tab-roles">
+<p class="tab-intro">Job titles and career paths that exist at this firm, from Trainee Solicitor through to Partner — including any distinctive routes worth knowing about.</p>
 <div id="rolesList" class="profile-list"></div>
 </section>
 
-<section class="profile-section" id="section-locations">
-<h2>Locations</h2>
+<section class="tab-panel" id="tab-locations">
+<p class="tab-intro">Every office this firm has, and which ones actually offer a training contract or vacation scheme (not every office does).</p>
 <div id="locationsList" class="profile-list"></div>
 </section>
 
-<section class="profile-section" id="section-vacation-schemes">
-<h2>Vacation Schemes</h2>
+<section class="tab-panel" id="tab-vacation-schemes">
+<p class="tab-intro">Short work-experience placements, usually during the summer — often the main route into a training contract at this firm.</p>
 <div id="vacationSchemesList" class="profile-list"></div>
 </section>
 
-<section class="profile-section" id="section-training-contract">
-<h2>Training Contract</h2>
+<section class="tab-panel" id="tab-training-contract">
+<p class="tab-intro">The firm's graduate training programme — salary, seats, deadlines and how to apply.</p>
 <div id="trainingContractList" class="profile-list"></div>
 </section>
 
