@@ -965,3 +965,30 @@ button {
     flex-direction: column;
   }
 }
+/* Font override — Calibri/Aptos style */
+:root {
+  --font-sans: Aptos, Calibri, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: var(--font-sans);
+}
+
+body,
+button,
+input,
+select,
+textarea,
+.brand,
+.hero-copy h1,
+.profile-header-text h1 {
+  font-family: var(--font-sans);
+}
+
+.hero-copy h1,
+.profile-header-text h1 {
+  font-weight: 800;
+  letter-spacing: -0.06em;
+}
+
+.brand {
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
