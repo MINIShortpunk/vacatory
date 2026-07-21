@@ -1051,3 +1051,37 @@ textarea,
   line-height: 1.02;
   max-width: 720px;
 }
+/* Header active page state + red favourite heart */
+
+.main-nav a {
+  position: relative;
+  padding: 8px 0;
+}
+
+.main-nav a.active,
+.main-nav a[aria-current="page"] {
+  color: var(--purple);
+}
+
+.main-nav a.active::after,
+.main-nav a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--purple);
+}
+
+.star.active {
+  background: #fff1f2;
+  color: #e11d48;
+  border-color: #fecdd3;
+}
+
+.star.active svg path {
+  fill: currentColor;
+  stroke: currentColor;
+}
