@@ -1,23 +1,16 @@
 // =======================================
 // Vacatory
-// theme.js — light/dark mode toggle
-// (the initial theme is set by an inline script in <head> to avoid a flash;
-// this file only wires up the button once the DOM is ready)
+// theme.js
 // =======================================
 
 document.addEventListener("DOMContentLoaded", () => {
+    const button = document.getElementById("themeToggle");
+    if (!button) return;
 
-    const btn = document.getElementById("themeToggle");
-    if (!btn) return;
-
-    btn.addEventListener("click", () => {
-
-        const isDark = document.documentElement.dataset.theme === "dark";
-        const next = isDark ? "light" : "dark";
-
+    button.addEventListener("click", () => {
+        const current = document.documentElement.dataset.theme || "light";
+        const next = current === "dark" ? "light" : "dark";
         document.documentElement.dataset.theme = next;
         localStorage.setItem("vacatory-theme", next);
-
     });
-
 });
