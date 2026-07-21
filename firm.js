@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadFirm();
-    setupTabs();
 
 });
 
@@ -48,49 +47,40 @@ async function loadFirm() {
     document.getElementById("firmType").textContent = firm.firm_type ?? "";
     document.getElementById("firmOverview").textContent = firm.overview ?? "";
 
-    const websiteLinkEl = document.getElementById("firmWebsiteLink");
-    websiteLinkEl.innerHTML = firm.website ? profileLink(firm.website, "Visit firm website") : "";
-
     const metaRow = document.getElementById("firmMeta");
     metaRow.innerHTML = "";
+
     if (firm.head_office) {
         metaRow.innerHTML += metaPill(locationIcon(), firm.head_office);
     }
+
     if (firm.uk_rank) {
         metaRow.innerHTML += metaPill(rankIcon(), `UK Rank #${firm.uk_rank}`);
     }
 
     // Overview tab
     document.getElementById("ov-size").textContent = firm.firm_size || "Not yet available";
-
-    document.getElementById("ov-secondments").innerHTML =
-        (firm.secondments || "Not yet available") +
-        (firm.careers_url ? ` ${profileLink(firm.careers_url, "More info")}` : "");
-
-    document.getElementById("ov-scholarships").innerHTML =
-        (firm.scholarships || "Not yet available") +
-        (firm.careers_url ? ` ${profileLink(firm.careers_url, "More info")}` : "");
-
-    document.getElementById("ov-visa").textContent = firm.visa_sponsorship || "Not confirmed on the firm's official site — check directly.";
+    document.getElementById("ov-secondments").textContent = firm.secondments || "Not yet available";
+    document.getElementById("ov-scholarships").textContent = firm.scholarships || "Not yet available";
 
     const links = document.getElementById("ov-links");
     links.innerHTML = "";
+
     if (firm.website) links.innerHTML += profileLink(firm.website, "Firm website");
     if (firm.careers_url) links.innerHTML += profileLink(firm.careers_url, "Careers page");
     if (firm.linkedin) links.innerHTML += profileLink(firm.linkedin, "LinkedIn");
 
-    // Firm Culture tab
-    document.getElementById("fc-awards").textContent = firm.awards || "Not yet available";
-    document.getElementById("fc-edi").textContent = firm.edi_work || "Not yet available";
-    document.getElementById("fc-probono").textContent = firm.pro_bono_work || "Not yet available";
-    document.getElementById("fc-clients").textContent = firm.key_clients || "Not yet available";
-
-    // Favourite button state (localStorage placeholder until auth/user_favourites is wired up)
+    // Favourite button state
     const favKey = `vacatory-fav-${firmId}`;
     const favBtn = document.getElementById("favouriteBtn");
-    if (localStorage.getItem(favKey)) favBtn.classList.add("active");
+
+    if (localStorage.getItem(favKey)) {
+        favBtn.classList.add("active");
+    }
+
     favBtn.addEventListener("click", () => {
         favBtn.classList.toggle("active");
+
         if (favBtn.classList.contains("active")) {
             localStorage.setItem(favKey, "1");
         } else {
@@ -130,6 +120,7 @@ function profileLink(url, label) {
 async function loadPracticeAreas() {
 
     const container = document.getElementById("practiceAreasList");
+
     const { data, error } = await client
         .from("practice_areas")
         .select("*")
@@ -153,9 +144,10 @@ async function loadPracticeAreas() {
 async function loadRoles() {
 
     const container = document.getElementById("rolesList");
+
     const { data, error } = await client
         .from("firm_roles")
-        .select("*")
+        .select("role_name")
         .eq("firm_id", firmId)
         .order("role_name", { ascending: true });
 
@@ -164,19 +156,18 @@ async function loadRoles() {
         return;
     }
 
-    container.innerHTML = data.map(role => `
-        <div class="profile-card">
-            <h3>${role.role_name}${role.confirmed === false ? ' <span class="unconfirmed-tag">Unconfirmed</span>' : ""}</h3>
-            <p>${role.description ?? ""}</p>
-            ${role.source_url ? profileLink(role.source_url, "Source") : ""}
-        </div>
-    `).join("");
+    container.innerHTML = `
+        <ul class="simple-role-list">
+            ${data.map(role => `<li>${role.role_name}</li>`).join("")}
+        </ul>
+    `;
 
 }
 
 async function loadLocations() {
 
     const container = document.getElementById("locationsList");
+
     const { data, error } = await client
         .from("locations")
         .select("*")
@@ -204,6 +195,7 @@ async function loadLocations() {
 async function loadVacationSchemes(careersUrl) {
 
     const container = document.getElementById("vacationSchemesList");
+
     const { data, error } = await client
         .from("vacation_schemes")
         .select("*")
@@ -237,6 +229,7 @@ async function loadVacationSchemes(careersUrl) {
 async function loadTrainingContracts(careersUrl) {
 
     const container = document.getElementById("trainingContractList");
+
     const { data, error } = await client
         .from("training_contracts")
         .select("*")
@@ -277,29 +270,19 @@ function fact(label, value) {
 
 function formatDate(d) {
     if (!d) return "";
+
     const date = new Date(d);
+
     if (isNaN(date)) return d;
-    return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+
+    return date.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
 }
 
 function formatMoney(n) {
     if (n === null || n === undefined) return "";
     return `£${Number(n).toLocaleString("en-GB")}`;
 }
-
-function setupTabs() {
-
-    const tabs = document.querySelectorAll(".tab-btn");
-    const panels = document.querySelectorAll(".tab-panel");
-
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            tabs.forEach(t => t.classList.remove("active"));
-            panels.forEach(p => p.classList.remove("active"));
-            tab.classList.add("active");
-            document.getElementById(`tab-${tab.dataset.tab}`).classList.add("active");
-        });
-    });
-
-}
-
