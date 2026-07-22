@@ -1102,3 +1102,66 @@ textarea,
 .firm-card h3 {
   letter-spacing: -0.01em;
 }
+/* Chronological deadlines table */
+
+#deadlinesList {
+  display: block;
+}
+
+.deadline-table {
+  width: 100%;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.deadline-table-head,
+.deadline-table-row {
+  display: grid;
+  grid-template-columns: 0.9fr 1.5fr 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.deadline-table-head {
+  color: var(--faint);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--card-soft);
+  border-bottom: 1px solid var(--border);
+}
+
+.deadline-table-row {
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.deadline-table-row:last-child {
+  border-bottom: 0;
+}
+
+.deadline-date {
+  color: var(--purple);
+  font-weight: 850;
+}
+
+.deadline-firm {
+  color: var(--text);
+  font-weight: 750;
+}
+
+@media (max-width: 720px) {
+  .deadline-table-head {
+    display: none;
+  }
+
+  .deadline-table-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
