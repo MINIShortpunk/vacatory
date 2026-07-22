@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <script>
+    (function () {
+      var saved = localStorage.getItem("vacatory-theme");
+      var theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+
+  <title>Deadlines — Vacatory</title>
+  <meta name="description" content="Track vacation scheme and training contract deadlines on Vacatory.">
+
+  <link rel="stylesheet" href="styles.css?v=7">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+
+      <a href="index.html" class="brand" aria-label="Vacatory home">
+        <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true">
+          <path d="M4 4 L14 24" class="logo-stroke-left" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
+          <path d="M24 4 L14 24" class="logo-stroke-right" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
+        </svg>
+        <span class="brand-word">acatory</span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="index.html#firms-section">Firms</a>
+        <a href="/deadlines.html" class="active" aria-current="page">Deadlines</a>
+        <a href="commercial-awareness.html">Commercial Awareness</a>
+        <a href="/favourites.html">Favourites</a>
+      </nav>
+
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" type="button">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+        </svg>
+
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+        </svg>
+      </button>
+
+    </div>
+  </header>
+
+  <main>
+
+    <section class="profile-hero">
+      <div class="container profile-hero-inner">
+
+        <a href="index.html#firms-section" class="back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M19 12H5M11 18l-6-6 6-6"></path>
+          </svg>
+          Back to firms
+        </a>
+
+        <div class="profile-header-text">
+          <p class="firm-type">Application tracker</p>
+          <h1>Deadlines</h1>
+        </div>
+
+        <p class="profile-overview">
+          A calm overview of upcoming vacation scheme and training contract dates. Use this as a starting point, then check each firm profile before applying.
+        </p>
+
+      </div>
+    </section>
+
+    <section class="search-section" aria-label="Search deadlines">
+      <div class="container">
+        <div class="search-panel">
+
+          <div class="search-control">
+            <label for="deadlineSearch" class="sr-only">Search deadlines</label>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="M20 20l-3.5-3.5"></path>
+            </svg>
+            <input id="deadlineSearch" type="search" placeholder="Search firms or schemes..." autocomplete="off">
+          </div>
+
+          <div class="filter-control">
+            <label for="deadlineType">Type</label>
+            <select id="deadlineType">
+              <option value="">All deadlines</option>
+              <option value="Vacation scheme">Vacation schemes</option>
+              <option value="Training contract">Training contracts</option>
+            </select>
+          </div>
+
+          <button id="deadlineReset" class="ghost-btn hidden" type="button">
+            Reset
+          </button>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="firms-section">
+      <div class="container">
+
+        <div class="section-heading-row">
+          <div>
+            <p class="eyebrow">Upcoming</p>
+            <h2>Application dates</h2>
+            <p id="deadlineCount" class="section-subtitle">Loading deadlines...</p>
+          </div>
+        </div>
+
+        <div id="deadlinesList" class="profile-list" aria-live="polite"></div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+
+      <a href="index.html" class="brand small" aria-label="Vacatory home">
+        <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true">
+          <path d="M4 4 L14 24" class="logo-stroke-left" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
+          <path d="M24 4 L14 24" class="logo-stroke-right" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
+        </svg>
+        <span class="brand-word">acatory</span>
+      </a>
+
+      <p class="footer-copy">© 2026 Vacatory</p>
+
+      <div class="footer-links">
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="theme.js"></script>
+
+  <script>
+    let allDeadlines = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadDeadlines();
+
+      document.getElementById("deadlineSearch").addEventListener("input", applyDeadlineFilters);
+      document.getElementById("deadlineType").addEventListener("change", applyDeadlineFilters);
+
+      document.getElementById("deadlineReset").addEventListener("click", () => {
+        document.getElementById("deadlineSearch").value = "";
+        document.getElementById("deadlineType").value = "";
+        applyDeadlineFilters();
+      });
+    });
+
+    async function loadDeadlines() {
+      const list = document.getElementById("deadlinesList");
+      const count = document.getElementById("deadlineCount");
+
+      list.innerHTML = "<p class='loading'>Loading deadlines...</p>";
+      count.textContent = "Loading deadlines...";
+
+      const [firmsResult, schemesResult, contractsResult] = await Promise.all([
+        client
+          .from("firms")
+          .select("id, name, active")
+          .eq("active", true),
+
+        client
+          .from("vacation_schemes")
+          .select("*"),
+
+        client
+          .from("training_contracts")
+          .select("*")
+      ]);
+
+      if (firmsResult.error || schemesResult.error || contractsResult.error) {
+        console.error(firmsResult.error || schemesResult.error || contractsResult.error);
+        list.innerHTML = "<p class='loading'>Unable to load deadlines.</p>";
+        count.textContent = "Something went wrong loading deadlines.";
+        return;
+      }
+
+      const firmNames = new Map();
+      (firmsResult.data || []).forEach(firm => {
+        firmNames.set(firm.id, firm.name);
+      });
+
+      const deadlines = [];
+
+      (schemesResult.data || []).forEach(scheme => {
+        if (!scheme.deadline) return;
+
+        deadlines.push({
+          firmId: scheme.firm_id,
+          firmName: firmNames.get(scheme.firm_id) || "Firm",
+          title: scheme.scheme_name || "Vacation scheme",
+          type: "Vacation scheme",
+          date: scheme.deadline,
+          opens: scheme.opens_on,
+          location: scheme.location,
+          status: scheme.status,
+          salary: scheme.salary,
+          eligibility: scheme.eligibility,
+          link: scheme.application_link
+        });
+      });
+
+      (contractsResult.data || []).forEach(contract => {
+        if (!contract.application_deadline) return;
+
+        deadlines.push({
+          firmId: contract.firm_id,
+          firmName: firmNames.get(contract.firm_id) || "Firm",
+          title: contract.intake_year ? `Training contract — ${contract.intake_year} intake` : "Training contract",
+          type: "Training contract",
+          date: contract.application_deadline,
+          opens: contract.application_open,
+          location: contract.location,
+          status: contract.status,
+          salary: contract.salary_first_year ? `Year 1: £${Number(contract.salary_first_year).toLocaleString("en-GB")}` : "",
+          eligibility: contract.eligibility,
+          link: contract.application_link
+        });
+      });
+
+      allDeadlines = deadlines
+        .filter(item => firmNames.has(item.firmId))
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      displayDeadlines(allDeadlines);
+    }
+
+    function displayDeadlines(deadlines) {
+      const list = document.getElementById("deadlinesList");
+      const count = document.getElementById("deadlineCount");
+
+      count.textContent = deadlines.length === 1
+        ? "Showing 1 deadline"
+        : `Showing ${deadlines.length} deadlines`;
+
+      if (!deadlines.length) {
+        list.innerHTML = "<p class='loading'>No deadlines found.</p>";
+        return;
+      }
+
+      list.innerHTML = deadlines.map(item => `
+        <article class="profile-card application-card">
+          <p class="firm-type">${escapeHtml(item.type)}</p>
+          <h3>${escapeHtml(item.firmName)}</h3>
+          <p>${escapeHtml(item.title)}</p>
+
+          <div class="profile-fact-grid">
+            ${fact("Opens", formatDate(item.opens))}
+            ${fact("Deadline", formatDate(item.date))}
+            ${fact("Location", item.location)}
+            ${fact("Status", item.status)}
+            ${fact("Salary", item.salary)}
+          </div>
+
+          ${item.eligibility ? `
+            <p class="profile-eligibility">
+              <strong>Eligibility:</strong> ${escapeHtml(item.eligibility)}
+            </p>
+          ` : ""}
+
+          <div class="profile-links">
+            <a href="firm.html?id=${encodeURIComponent(item.firmId)}" class="firm-link profile-external-link">
+              View firm
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6"></path>
+              </svg>
+            </a>
+
+            ${item.link ? `
+              <a href="${escapeHtml(item.link)}" target="_blank" rel="noopener" class="firm-link profile-external-link">
+                Apply / more info
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M7 17L17 7M7 7h10v10"></path>
+                </svg>
+              </a>
+            ` : ""}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function applyDeadlineFilters() {
+      const search = document.getElementById("deadlineSearch").value.trim().toLowerCase();
+      const type = document.getElementById("deadlineType").value;
+      const reset = document.getElementById("deadlineReset");
+
+      const filtered = allDeadlines.filter(item => {
+        const matchesSearch = !search ||
+          item.firmName.toLowerCase().includes(search) ||
+          item.title.toLowerCase().includes(search) ||
+          (item.location || "").toLowerCase().includes(search);
+
+        const matchesType = !type || item.type === type;
+
+        return matchesSearch && matchesType;
+      });
+
+      reset.classList.toggle("hidden", !(search || type));
+      displayDeadlines(filtered);
+    }
+
+    function fact(label, value) {
+      if (!value) return "";
+
+      return `
+        <div class="fact">
+          <span class="fact-label">${escapeHtml(label)}</span>
+          <span class="fact-value">${escapeHtml(value)}</span>
+        </div>
+      `;
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+
+      const date = new Date(value);
+      if (isNaN(date)) return value;
+
+      return date.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+
+</body>
+</html>
