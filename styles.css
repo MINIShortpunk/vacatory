@@ -1239,3 +1239,23 @@ textarea,
     justify-self: start;
   }
 }
+/* Temporary live-site update notice */
+.site-notice {
+  border-bottom: 1px solid var(--border);
+  background: var(--card-soft);
+}
+
+.site-notice .container {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.site-notice strong {
+  color: var(--text);
+}
