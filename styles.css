@@ -278,7 +278,7 @@ svg {
 /* Hero */
 
 .home-hero {
-  min-height: 505px;
+  min-height: 430px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
@@ -289,7 +289,7 @@ svg {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 64px 56px 64px 40px;
+  padding: 50px 56px 50px 40px;
 }
 
 .hero-copy-inner {
@@ -312,7 +312,7 @@ svg {
 .hero-search {
   min-height: 57px;
   width: min(100%, 510px);
-  margin-top: 34px;
+  margin-top: 30px;
   padding: 0 18px;
   display: flex;
   align-items: center;
@@ -348,7 +348,7 @@ svg {
 }
 
 .hero-image {
-  min-height: 505px;
+  min-height: 430px;
   position: relative;
   background:
     linear-gradient(
@@ -408,7 +408,7 @@ svg {
 /* Pathways */
 
 .pathways-section {
-  padding: 66px 0 74px;
+  padding: 58px 0 74px;
 }
 
 .pathways-heading {
@@ -1132,6 +1132,7 @@ svg {
   }
 
   .home-hero {
+    min-height: auto;
     grid-template-columns: 1fr;
   }
 
@@ -1141,7 +1142,7 @@ svg {
   }
 
   .hero-image {
-    min-height: 360px;
+    min-height: 340px;
   }
 
   .pathways-grid {
@@ -1220,7 +1221,7 @@ svg {
   }
 
   .hero-image {
-    min-height: 275px;
+    min-height: 250px;
   }
 
   .pathways-section,
