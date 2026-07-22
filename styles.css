@@ -1085,3 +1085,20 @@ textarea,
   fill: currentColor;
   stroke: currentColor;
 }
+/* Softer letter spacing across headings */
+.hero-copy h1,
+.profile-header-text h1 {
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.brand {
+  letter-spacing: -0.02em;
+}
+
+.section-heading-row h2,
+.tab-heading h2,
+.profile-card h3,
+.firm-card h3 {
+  letter-spacing: -0.01em;
+}
