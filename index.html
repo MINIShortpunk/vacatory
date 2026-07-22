@@ -16,22 +16,16 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f7f2eb">
+  <meta name="theme-color" content="#ffffff">
 
-  <title>Vacatory — Law careers, organised</title>
+  <title>Vacatory — UK legal careers</title>
+
   <meta
     name="description"
-    content="Research law firms, compare opportunities and keep track of vacation scheme and training contract deadlines."
+    content="Explore UK law firms, barristers’ chambers, legal opportunities and application deadlines."
   >
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
-
-  <link rel="stylesheet" href="styles.css?v=13">
+  <link rel="stylesheet" href="styles.css?v=14">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
 </head>
@@ -43,34 +37,80 @@
     <div class="container header-inner">
       <a href="index.html" class="brand" aria-label="Vacatory home">
         <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true">
-          <path d="M4 4 L14 24" class="logo-stroke-left" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
-          <path d="M24 4 L14 24" class="logo-stroke-right" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
+          <path
+            d="M4 4 L14 24"
+            class="logo-stroke-left"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+
+          <path
+            d="M24 4 L14 24"
+            class="logo-stroke-right"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
         </svg>
-        <span class="brand-word">acatory</span>
+
+        <span class="brand-lockup">
+          <span class="brand-word">acatory</span>
+          <span class="brand-subtitle">UK legal careers</span>
+        </span>
       </a>
 
       <nav class="main-nav" aria-label="Main navigation">
-        <a href="#firms-section" class="active" aria-current="page">Firms</a>
         <a href="deadlines.html">Deadlines</a>
+        <a href="#firms-section">Firms</a>
+        <a href="#chambers-section">Chambers</a>
         <a href="commercial-awareness.html">Commercial Awareness</a>
-        <a href="favourites.html">Favourites</a>
       </nav>
 
       <div class="header-actions">
-        <a class="header-search-link" href="#firm-search" aria-label="Search firms">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <a
+          class="header-search-link"
+          href="#firm-search"
+          aria-label="Search Vacatory"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
             <circle cx="11" cy="11" r="7"></circle>
             <path d="M20 20l-3.5-3.5"></path>
           </svg>
         </a>
 
-        <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" type="button">
-          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <button
+          id="themeToggle"
+          class="theme-toggle"
+          aria-label="Toggle dark mode"
+          type="button"
+        >
+          <svg
+            class="icon-sun"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
             <circle cx="12" cy="12" r="4"></circle>
             <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
           </svg>
 
-          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <svg
+            class="icon-moon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
             <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
           </svg>
         </button>
@@ -82,113 +122,176 @@
     <div class="container notice-inner">
       <span class="notice-dot" aria-hidden="true"></span>
       <strong>Site update in progress.</strong>
-      <span>Some information may change while the database is refreshed.</span>
+      <span>
+        Vacatory is currently being rebuilt and some information may change.
+      </span>
     </div>
   </div>
 
   <main id="main-content">
     <section class="home-hero" aria-labelledby="hero-title">
-      <div class="hero-media" aria-hidden="true"></div>
-      <div class="hero-shade" aria-hidden="true"></div>
-
-      <div class="container hero-layout">
-        <div class="hero-copy">
-          <p class="eyebrow">Law careers, organised.</p>
-
+      <div class="hero-copy-panel">
+        <div class="hero-copy-inner">
           <h1 id="hero-title">
-            Your future<br>
-            <span>in law.</span>
+            Focus on<br>
+            what moves<br>
+            you forward<span aria-hidden="true">.</span>
           </h1>
 
+          <p class="hero-description">
+            Your complete guide to UK legal careers. Find deadlines,
+            opportunities and essential information for solicitors and
+            barristers.
+          </p>
+
           <div class="hero-search" id="firm-search">
-            <label for="searchInput" class="sr-only">Search firms, locations or opportunities</label>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <label for="searchInput" class="sr-only">
+              Search firms, chambers and opportunities
+            </label>
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
               <circle cx="11" cy="11" r="7"></circle>
               <path d="M20 20l-3.5-3.5"></path>
             </svg>
+
             <input
               id="searchInput"
               type="search"
-              placeholder="Search firms, locations or opportunities"
+              placeholder="Search firms, chambers, opportunities and more…"
               autocomplete="off"
             >
-            <a href="#firms-section" class="search-submit" aria-label="View matching firms">→</a>
           </div>
         </div>
+      </div>
 
-        <aside class="deadline-card" id="deadlines-preview" aria-label="Upcoming deadlines preview">
-          <div class="deadline-card-header">
-            <div>
-              <p class="eyebrow">Deadlines</p>
-              <h2>Upcoming</h2>
+      <div class="hero-image" aria-hidden="true"></div>
+    </section>
+
+    <section class="pathways-section" aria-labelledby="pathways-title">
+      <div class="container">
+        <div class="pathways-heading">
+          <p id="pathways-title">Choose your path</p>
+          <span aria-hidden="true"></span>
+        </div>
+
+        <div class="pathways-grid">
+          <section
+            id="firms-section"
+            class="pathway-column pathway-firms"
+            aria-labelledby="firms-title"
+          >
+            <div class="pathway-heading">
+              <p class="eyebrow">Solicitor pathway</p>
+              <h2 id="firms-title">UK Law Firms</h2>
+
+              <p>
+                Explore leading UK law firms, training contracts, vacation
+                schemes and other early-career opportunities.
+              </p>
             </div>
-            <a href="deadlines.html" class="small-link">View all <span aria-hidden="true">→</span></a>
-          </div>
 
-          <div class="deadline-list" id="deadlinePreviewList">
-            <article class="deadline-row">
-              <div>
-                <strong>A&amp;O Shearman</strong>
-                <span>Vacation scheme</span>
-              </div>
-              <time datetime="2026-08-01">1 Aug</time>
-            </article>
+            <div class="directory-preview">
+              <p id="firmCount" class="directory-status">
+                Loading firms…
+              </p>
 
-            <article class="deadline-row">
-              <div>
-                <strong>Linklaters</strong>
-                <span>Training contract</span>
-              </div>
-              <time datetime="2026-08-31">31 Aug</time>
-            </article>
+              <div
+                id="firms"
+                class="directory-list"
+                aria-live="polite"
+              ></div>
+            </div>
 
-            <article class="deadline-row">
-              <div>
-                <strong>Freshfields</strong>
-                <span>Vacation scheme</span>
-              </div>
-              <time datetime="2026-09-15">15 Sep</time>
-            </article>
+            <a href="firms.html" class="pathway-link">
+              Explore all 50 firms
+              <span aria-hidden="true">→</span>
+            </a>
+          </section>
 
-            <article class="deadline-row">
-              <div>
-                <strong>Slaughter and May</strong>
-                <span>Training contract</span>
+          <section
+            id="chambers-section"
+            class="pathway-column pathway-chambers"
+            aria-labelledby="chambers-title"
+          >
+            <div class="pathway-heading">
+              <p class="eyebrow">Barrister pathway</p>
+              <h2 id="chambers-title">Barristers’ Chambers</h2>
+
+              <p>
+                Discover barristers’ chambers and opportunities including
+                pupillages, mini-pupillages and insight programmes.
+              </p>
+            </div>
+
+            <div
+              id="chambersPreview"
+              class="directory-list chambers-preview"
+              aria-live="polite"
+            >
+              <div class="directory-empty">
+                <p>Chambers directory in preparation.</p>
+                <span>
+                  Profiles will appear here as each chambers is fully
+                  researched and verified.
+                </span>
               </div>
-              <time datetime="2026-10-01">1 Oct</time>
-            </article>
-          </div>
-        </aside>
+            </div>
+
+            <a href="chambers.html" class="pathway-link">
+              Explore all chambers
+              <span aria-hidden="true">→</span>
+            </a>
+          </section>
+        </div>
       </div>
     </section>
 
-    <section class="quick-strip" aria-label="Vacatory features">
-      <div class="container quick-strip-grid">
-        <a href="#firms-section" class="quick-item">
-          <span class="quick-number">01</span>
-          <strong>Research firms</strong>
-          <span aria-hidden="true">→</span>
-        </a>
+    <section class="deadlines-home-section" aria-labelledby="deadlines-title">
+      <div class="container deadlines-home-grid">
+        <div class="deadlines-home-copy">
+          <p class="eyebrow">Upcoming deadlines</p>
 
-        <a href="deadlines.html" class="quick-item">
-          <span class="quick-number">02</span>
-          <strong>Track deadlines</strong>
-          <span aria-hidden="true">→</span>
-        </a>
+          <h2 id="deadlines-title">What’s coming up</h2>
 
-        <a href="commercial-awareness.html" class="quick-item">
-          <span class="quick-number">03</span>
-          <strong>Follow the market</strong>
-          <span aria-hidden="true">→</span>
-        </a>
+          <span class="section-rule" aria-hidden="true"></span>
+
+          <p>
+            A quick look at approaching application deadlines across firms and
+            chambers.
+          </p>
+
+          <a href="deadlines.html" class="outline-link">
+            View all deadlines
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div
+          id="deadlines-preview"
+          class="deadlines-home-list"
+          aria-label="Upcoming deadlines preview"
+        >
+          <div id="deadlinePreviewList" aria-live="polite">
+            <div class="deadline-loading">
+              Loading upcoming deadlines…
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="search-section" aria-label="Filter firms">
+    <section class="search-section" aria-label="Filter law firms">
       <div class="container">
         <div class="search-panel">
           <div class="filter-control">
             <label for="filterPracticeArea">Practice area</label>
+
             <select id="filterPracticeArea">
               <option value="">All practice areas</option>
             </select>
@@ -196,6 +299,7 @@
 
           <div class="filter-control">
             <label for="filterRole">Role</label>
+
             <select id="filterRole">
               <option value="">All roles</option>
             </select>
@@ -203,29 +307,20 @@
 
           <div class="filter-control">
             <label for="filterFirmType">Firm type</label>
+
             <select id="filterFirmType">
               <option value="">All firm types</option>
             </select>
           </div>
 
-          <button id="filterReset" class="ghost-btn hidden" type="button">Reset</button>
+          <button
+            id="filterReset"
+            class="ghost-btn hidden"
+            type="button"
+          >
+            Reset filters
+          </button>
         </div>
-      </div>
-    </section>
-
-    <section id="firms-section" class="firms-section">
-      <div class="container">
-        <div class="section-heading-row">
-          <div>
-            <p class="eyebrow">Firm directory</p>
-            <h2>Top UK firms</h2>
-            <p id="firmCount" class="section-subtitle">Loading firms…</p>
-          </div>
-
-          <a href="#firms-section" class="small-link">View all <span aria-hidden="true">→</span></a>
-        </div>
-
-        <div id="firms" class="firms-grid" aria-live="polite"></div>
       </div>
     </section>
   </main>
@@ -234,13 +329,32 @@
     <div class="container footer-inner">
       <a href="index.html" class="brand small" aria-label="Vacatory home">
         <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true">
-          <path d="M4 4 L14 24" class="logo-stroke-left" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
-          <path d="M24 4 L14 24" class="logo-stroke-right" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
+          <path
+            d="M4 4 L14 24"
+            class="logo-stroke-left"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+
+          <path
+            d="M24 4 L14 24"
+            class="logo-stroke-right"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
         </svg>
-        <span class="brand-word">acatory</span>
+
+        <span class="brand-lockup">
+          <span class="brand-word">acatory</span>
+          <span class="brand-subtitle">UK legal careers</span>
+        </span>
       </a>
 
-      <p class="footer-copy">© 2026 Vacatory</p>
+      <p class="footer-statement">
+        Independent. Unbiased. Built for future lawyers.
+      </p>
 
       <div class="footer-links">
         <a href="#">About</a>
@@ -250,7 +364,11 @@
     </div>
   </footer>
 
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
   <script defer src="supabase.js"></script>
   <script defer src="app.js"></script>
   <script defer src="theme.js"></script>
