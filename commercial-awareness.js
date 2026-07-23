@@ -68,9 +68,7 @@ function bindCommercialAwarenessControls() {
   document
     .getElementById("loadMoreNews")
     ?.addEventListener("click", () => {
-      visibleArticleCount +=
-        ARTICLES_PER_PAGE;
-
+      visibleArticleCount += ARTICLES_PER_PAGE;
       renderNewsFeed();
     });
 }
@@ -613,7 +611,7 @@ function renderLeadStory() {
 
   const sourceLabel =
     leadArticle.source_name ||
-    "Official source";
+    "Source not stated";
 
   const headlineMarkup =
     articleUrl
@@ -652,8 +650,20 @@ function renderLeadStory() {
       <span aria-hidden="true">·</span>
 
       <span>
-        ${escapeHtml(sourceLabel)}
+        From: ${escapeHtml(sourceLabel)}
       </span>
+
+      ${
+        leadArticle.is_official_source
+          ? `
+            <span aria-hidden="true">·</span>
+
+            <span>
+              Official source
+            </span>
+          `
+          : ""
+      }
 
       <span aria-hidden="true">·</span>
 
@@ -807,7 +817,7 @@ function renderArticleCard(article) {
 
   const sourceLabel =
     article.source_name ||
-    "Official source";
+    "Source not stated";
 
   const headlineMarkup =
     articleUrl
@@ -957,13 +967,14 @@ function renderArticleCard(article) {
           }
 
           <span class="ca-card-source">
+            <strong>From:</strong>
             ${escapeHtml(
               sourceLabel
             )}
 
             ${
               article.is_official_source
-                ? " · Official"
+                ? " · Official source"
                 : ""
             }
           </span>
