@@ -5,231 +5,323 @@
 
   <script>
     (function () {
-      var saved = localStorage.getItem("vacatory-theme");
-      var theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-      document.documentElement.dataset.theme = theme;
+      var savedTheme = localStorage.getItem("vacatory-theme");
+      var preferredTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+
+      document.documentElement.dataset.theme =
+        savedTheme || preferredTheme;
     })();
   </script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff">
 
-  <title>Firm profile — Vacatory</title>
-  <meta name="description" content="Research law firm practice areas, locations, roles, vacation schemes and training contracts on Vacatory.">
+  <title>UK Law Firms — Vacatory</title>
 
-  <link rel="stylesheet" href="styles.css?v=11">
+  <meta
+    name="description"
+    content="Search and compare UK law firms, locations, practice areas and legal career opportunities."
+  >
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
+  <link rel="stylesheet" href="styles.css?v=16">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
 </head>
 
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
   <header class="site-header">
     <div class="container header-inner">
 
       <a href="index.html" class="brand" aria-label="Vacatory home">
         <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true">
-          <path d="M4 4 L14 24" class="logo-stroke-left" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
-          <path d="M24 4 L14 24" class="logo-stroke-right" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
+          <path
+            d="M4 4 L14 24"
+            class="logo-stroke-left"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+
+          <path
+            d="M24 4 L14 24"
+            class="logo-stroke-right"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
         </svg>
+
         <span class="brand-word">acatory</span>
       </a>
 
       <nav class="main-nav" aria-label="Main navigation">
-  <a href="index.html#firms-section" class="active" aria-current="page">Firms</a>
-  <a href="/deadlines.html">Deadlines</a>
-  <a href="commercial-awareness.html">Commercial Awareness</a>
-  <a href="/favourites.html">Favourites</a>
-</nav>
+        <a href="firms.html" class="active" aria-current="page">
+          Firms
+        </a>
 
-      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" type="button">
-        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <circle cx="12" cy="12" r="4"></circle>
-          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
-        </svg>
+        <a href="chambers.html">
+          Chambers
+        </a>
 
-        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
-        </svg>
-      </button>
+        <a href="deadlines.html">
+          Deadlines
+        </a>
+
+        <a href="commercial-awareness.html">
+          Commercial Awareness
+        </a>
+      </nav>
+
+      <div class="header-actions">
+        <a
+          class="header-search-link"
+          href="#directorySearch"
+          aria-label="Search firms"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+          </svg>
+        </a>
+
+        <button
+          id="themeToggle"
+          class="theme-toggle"
+          aria-label="Toggle dark mode"
+          type="button"
+        >
+          <svg
+            class="icon-sun"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>
+
+          <svg
+            class="icon-moon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+        </button>
+      </div>
 
     </div>
   </header>
 
-  <main>
-
-    <div id="loadingState" class="container profile-loading">
-      <p class="loading">Loading firm…</p>
+  <div class="site-notice" role="status">
+    <div class="container notice-inner">
+      <span class="notice-dot" aria-hidden="true"></span>
+      <strong>Site update in progress.</strong>
+      <span>Some information may change.</span>
     </div>
+  </div>
 
-    <div id="errorState" class="container profile-loading hidden">
-      <p class="loading">
-        Firm not found.
-        <a href="index.html#firms-section">Back to firms</a>
-      </p>
-    </div>
+  <main id="main-content">
 
-    <div id="profileContent" class="hidden">
+    <section class="profile-hero" aria-labelledby="page-title">
+      <div class="container profile-hero-inner">
 
-      <section class="profile-hero">
-        <div class="container profile-hero-inner">
+        <p class="eyebrow">Solicitor pathway</p>
 
-          <a href="index.html#firms-section" class="back-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M19 12H5M11 18l-6-6 6-6"></path>
-            </svg>
-            Back to firms
-          </a>
-
-          <div class="profile-header-row">
-
-            <div id="firmLogo" class="firm-logo profile-logo" aria-hidden="true"></div>
-
-            <div class="profile-header-text">
-              <p id="firmType" class="firm-type"></p>
-              <h1 id="firmName"></h1>
-            </div>
-
-            <button id="favouriteBtn" class="star profile-star" aria-label="Favourite firm" type="button">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M12 21s-7.5-4.6-10-9.3C.5 8.2 2 4.5 5.6 4c2-.3 3.9.7 5 2.3C11.7 4.7 13.6 3.7 15.6 4c3.6.5 5.1 4.2 3.6 7.7C16.7 16.4 12 21 12 21z"></path>
-              </svg>
-            </button>
-
-          </div>
-
-          <p id="firmOverview" class="profile-overview"></p>
-
-          <div id="firmMeta" class="profile-meta-row" aria-label="Firm key details"></div>
-
+        <div class="profile-header-text">
+          <h1 id="page-title">UK Law Firms</h1>
         </div>
-      </section>
 
-      <nav class="profile-tabs" id="profileTabs" aria-label="Firm profile sections">
-        <div class="container profile-tabs-inner">
-          <button class="tab-btn active" type="button" data-tab="overview">Overview</button>
-          <button class="tab-btn" type="button" data-tab="practice-areas">Practice areas</button>
-          <button class="tab-btn" type="button" data-tab="roles">Roles</button>
-          <button class="tab-btn" type="button" data-tab="locations">Locations</button>
-          <button class="tab-btn" type="button" data-tab="vacation-schemes">Vacation schemes</button>
-          <button class="tab-btn" type="button" data-tab="training-contract">Training contract</button>
-        </div>
-      </nav>
-
-      <div class="container profile-body">
-
-        <section class="tab-panel active" id="tab-overview">
-          <div class="tab-heading">
-            <p class="eyebrow">At a glance</p>
-            <h2>Overview</h2>
-            <p class="tab-intro">
-              Key information to help you understand the firm before you start application research.
-            </p>
-          </div>
-
-          <div class="profile-grid">
-            <article class="profile-card">
-              <h3>Firm size</h3>
-              <p id="ov-size">—</p>
-            </article>
-
-            <article class="profile-card">
-              <h3>Secondments</h3>
-              <p id="ov-secondments">—</p>
-            </article>
-
-            <article class="profile-card">
-              <h3>Scholarships</h3>
-              <p id="ov-scholarships">—</p>
-            </article>
-          </div>
-
-          <div id="ov-links" class="profile-links"></div>
-        </section>
-
-        <section class="tab-panel" id="tab-practice-areas">
-          <div class="tab-heading">
-            <p class="eyebrow">Work areas</p>
-            <h2>Practice areas</h2>
-            <p class="tab-intro">
-              Legal areas the firm works in, useful for matching your interests and preparing application answers.
-            </p>
-          </div>
-
-          <div id="practiceAreasList" class="profile-list"></div>
-        </section>
-
-        <section class="tab-panel" id="tab-roles">
-          <div class="tab-heading">
-            <p class="eyebrow">Career paths</p>
-            <h2>Roles</h2>
-            <p class="tab-intro">
-              Job titles and career routes connected to the firm.
-            </p>
-          </div>
-
-          <div id="rolesList" class="profile-list roles-list"></div>
-        </section>
-
-        <section class="tab-panel" id="tab-locations">
-          <div class="tab-heading">
-            <p class="eyebrow">Offices</p>
-            <h2>Locations</h2>
-            <p class="tab-intro">
-              Office locations, including whether training contracts or vacation schemes are available there.
-            </p>
-          </div>
-
-          <div id="locationsList" class="profile-list"></div>
-        </section>
-
-        <section class="tab-panel" id="tab-vacation-schemes">
-          <div class="tab-heading">
-            <p class="eyebrow">Applications</p>
-            <h2>Vacation schemes</h2>
-            <p class="tab-intro">
-              Work-experience schemes, deadlines, eligibility and application links.
-            </p>
-          </div>
-
-          <div id="vacationSchemesList" class="profile-list"></div>
-        </section>
-
-        <section class="tab-panel" id="tab-training-contract">
-          <div class="tab-heading">
-            <p class="eyebrow">Graduate route</p>
-            <h2>Training contract</h2>
-            <p class="tab-intro">
-              Training contract details, salary information, seats, deadlines and application links.
-            </p>
-          </div>
-
-          <div id="trainingContractList" class="profile-list"></div>
-        </section>
+        <p class="profile-overview">
+          Explore firms, office locations, practice areas and early-career
+          opportunities. Profiles are based on official sources and are
+          updated as research is completed.
+        </p>
 
       </div>
+    </section>
 
-    </div>
+    <section
+      class="search-section"
+      aria-label="Search and filter law firms"
+    >
+      <div class="container">
+
+        <div class="search-panel">
+
+          <div class="filter-control">
+            <label for="directorySearch">Search firms</label>
+
+            <input
+              id="directorySearch"
+              type="search"
+              placeholder="Search by firm name"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="filter-control">
+            <label for="sortFilter">Sort by</label>
+
+            <select id="sortFilter">
+              <option value="rank">UK ranking</option>
+              <option value="az">Firm name A–Z</option>
+              <option value="za">Firm name Z–A</option>
+            </select>
+          </div>
+
+          <div class="filter-control">
+            <label for="locationFilter">Location</label>
+
+            <select id="locationFilter">
+              <option value="">All locations</option>
+            </select>
+          </div>
+
+          <div class="filter-control">
+            <label for="practiceFilter">Practice area</label>
+
+            <select id="practiceFilter">
+              <option value="">All practice areas</option>
+            </select>
+          </div>
+
+          <div class="filter-control">
+            <label for="roleFilter">Opportunity</label>
+
+            <select id="roleFilter">
+              <option value="">All opportunities</option>
+            </select>
+          </div>
+
+          <div class="filter-control">
+            <label for="statusFilter">Application status</label>
+
+            <select id="statusFilter">
+              <option value="">All statuses</option>
+              <option value="open">Open</option>
+              <option value="upcoming">Upcoming</option>
+              <option value="rolling">Rolling</option>
+              <option value="closed">Closed</option>
+              <option value="unknown">Not announced</option>
+            </select>
+          </div>
+
+          <button
+            id="clearFilters"
+            class="ghost-btn"
+            type="button"
+          >
+            Clear filters
+          </button>
+
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="firms-section"
+      aria-labelledby="firms-directory-title"
+    >
+      <div class="container">
+
+        <div class="section-heading-row">
+          <div>
+            <h2 id="firms-directory-title">Law firms</h2>
+
+            <p
+              id="directoryCount"
+              class="section-subtitle"
+              aria-live="polite"
+            >
+              Loading firms…
+            </p>
+          </div>
+        </div>
+
+        <div
+          id="directoryLoading"
+          class="directory-empty"
+          role="status"
+        >
+          <p>Loading firms…</p>
+          <span>Please wait while the directory loads.</span>
+        </div>
+
+        <div
+          id="directoryError"
+          class="directory-empty hidden"
+          role="alert"
+        >
+          <p>Unable to load firms</p>
+          <span>Please refresh the page and try again.</span>
+        </div>
+
+        <div
+          id="directoryEmpty"
+          class="directory-empty hidden"
+        >
+          <p>No firms match these filters</p>
+          <span>Try clearing one or more filters.</span>
+        </div>
+
+        <div
+          id="firmsDirectory"
+          class="firms-grid"
+          aria-live="polite"
+        ></div>
+
+      </div>
+    </section>
 
   </main>
 
   <footer class="site-footer">
     <div class="container footer-inner">
 
-      <a href="index.html" class="brand small" aria-label="Vacatory home">
+      <a
+        href="index.html"
+        class="brand small"
+        aria-label="Vacatory home"
+      >
         <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true">
-          <path d="M4 4 L14 24" class="logo-stroke-left" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
-          <path d="M24 4 L14 24" class="logo-stroke-right" stroke-width="3.4" stroke-linecap="round" fill="none"></path>
+          <path
+            d="M4 4 L14 24"
+            class="logo-stroke-left"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+
+          <path
+            d="M24 4 L14 24"
+            class="logo-stroke-right"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
         </svg>
+
         <span class="brand-word">acatory</span>
       </a>
 
-      <p class="footer-copy">© 2026 Vacatory</p>
+      <p class="footer-statement">© 2026 Vacatory</p>
 
       <div class="footer-links">
         <a href="#">About</a>
@@ -240,10 +332,13 @@
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js"></script>
-  <script src="firm.js?v=2"></script>
-  <script src="theme.js"></script>
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
 
+  <script defer src="supabase.js"></script>
+  <script defer src="firms.js?v=1"></script>
+  <script defer src="theme.js?v=2"></script>
 </body>
 </html>
