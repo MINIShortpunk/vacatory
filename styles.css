@@ -216,6 +216,26 @@ svg {
   align-items: center;
   gap: 8px;
 }
+.mobile-menu-toggle {
+  display: none;
+  width: 39px;
+  height: 39px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text);
+  place-items: center;
+}
+
+.mobile-menu-toggle:hover {
+  color: var(--purple);
+  border-color: var(--border-strong);
+}
+
+.mobile-menu-toggle svg {
+  width: 18px;
+  height: 18px;
+}
 
 .header-search-link,
 .theme-toggle {
@@ -1186,8 +1206,11 @@ svg {
     text-align: left;
   }
 }
-
 @media (max-width: 680px) {
+  .mobile-menu-toggle {
+    display: grid;
+  }
+
   .container {
     width: min(100% - 28px, 1160px);
   }
