@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <script>
+    (function () {
+      var savedTheme = localStorage.getItem("vacatory-theme");
+
+      var preferredTheme = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches
+        ? "dark"
+        : "light";
+
+      document.documentElement.dataset.theme =
+        savedTheme || preferredTheme;
+    })();
+  </script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff">
+
+  <title>Chambers profile — Vacatory</title>
+
+  <meta
+    name="description"
+    content="Research barristers’ chambers, practice areas, pupillages, mini-pupillages, funding and application information on Vacatory."
+  >
+
+  <link rel="stylesheet" href="styles.css?v=16">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+
+<body>
+  <a class="skip-link" href="#main-content">
+    Skip to content
+  </a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+
+      <a href="index.html" class="brand" aria-label="Vacatory home">
+        <svg
+          class="brand-mark"
+          viewBox="0 0 28 28"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 4 L14 24"
+            class="logo-stroke-left"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+
+          <path
+            d="M24 4 L14 24"
+            class="logo-stroke-right"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+        </svg>
+
+        <span class="brand-word">acatory</span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="firms.html">
+          Firms
+        </a>
+
+        <a
+          href="chambers.html"
+          class="active"
+          aria-current="page"
+        >
+          Chambers
+        </a>
+
+        <a href="deadlines.html">
+          Deadlines
+        </a>
+
+        <a href="commercial-awareness.html">
+          Commercial Awareness
+        </a>
+      </nav>
+
+      <div class="header-actions">
+
+        <button
+          id="mobileMenuToggle"
+          class="mobile-menu-toggle"
+          type="button"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+          aria-controls="mobileNavigation"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16"></path>
+            <path d="M4 12h16"></path>
+            <path d="M4 17h16"></path>
+          </svg>
+        </button>
+
+        <a
+          class="header-search-link"
+          href="chambers.html"
+          aria-label="Search chambers"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+          </svg>
+        </a>
+
+        <button
+          id="themeToggle"
+          class="theme-toggle"
+          aria-label="Toggle dark mode"
+          type="button"
+        >
+          <svg
+            class="icon-sun"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>
+
+          <svg
+            class="icon-moon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <nav
+    id="mobileNavigation"
+    class="mobile-navigation"
+    aria-label="Mobile navigation"
+    hidden
+  >
+    <a href="firms.html">
+      Firms
+    </a>
+
+    <a href="chambers.html" aria-current="page">
+      Chambers
+    </a>
+
+    <a href="deadlines.html">
+      Deadlines
+    </a>
+
+    <a href="commercial-awareness.html">
+      Commercial Awareness
+    </a>
+  </nav>
+
+  <div class="site-notice" role="status">
+    <div class="container notice-inner">
+      <span class="notice-dot" aria-hidden="true"></span>
+
+      <strong>Site update in progress.</strong>
+
+      <span>
+        Chambers research is being added.
+      </span>
+    </div>
+  </div>
+
+  <main id="main-content">
+
+    <div
+      id="loadingState"
+      class="container profile-loading"
+      role="status"
+    >
+      <p class="loading">
+        Loading chambers…
+      </p>
+    </div>
+
+    <div
+      id="errorState"
+      class="container profile-loading hidden"
+      role="alert"
+    >
+      <p class="loading">
+        Chambers profile not found.
+        <a href="chambers.html">Back to chambers</a>
+      </p>
+    </div>
+
+    <div id="profileContent" class="hidden">
+
+      <section class="profile-hero">
+        <div class="container profile-hero-inner">
+
+          <a href="chambers.html" class="back-link">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path d="M19 12H5"></path>
+              <path d="M11 18l-6-6 6-6"></path>
+            </svg>
+
+            Back to chambers
+          </a>
+
+          <div class="profile-header-row">
+
+            <div
+              id="chambersLogo"
+              class="firm-logo profile-logo"
+              aria-hidden="true"
+            ></div>
+
+            <div class="profile-header-text">
+              <p id="chambersType" class="firm-type"></p>
+              <h1 id="chambersName"></h1>
+            </div>
+
+          </div>
+
+          <p
+            id="chambersOverview"
+            class="profile-overview"
+          ></p>
+
+          <div
+            id="chambersMeta"
+            class="profile-meta-row"
+            aria-label="Chambers key details"
+          ></div>
+
+        </div>
+      </section>
+
+      <nav
+        class="profile-tabs"
+        id="profileTabs"
+        aria-label="Chambers profile sections"
+      >
+        <div class="container profile-tabs-inner">
+
+          <button
+            class="tab-btn active"
+            type="button"
+            data-tab="overview"
+          >
+            Overview
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="practice-areas"
+          >
+            Practice areas
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="pupillage"
+          >
+            Pupillage
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="mini-pupillage"
+          >
+            Mini-pupillage
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="funding"
+          >
+            Funding
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="locations"
+          >
+            Locations
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="accessibility"
+          >
+            EDI & accessibility
+          </button>
+
+        </div>
+      </nav>
+
+      <div class="container profile-body">
+
+        <section
+          class="tab-panel active"
+          id="tab-overview"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              At a glance
+            </p>
+
+            <h2>
+              Overview
+            </h2>
+
+            <p class="tab-intro">
+              Key information about the chambers, its members,
+              structure and official recruitment information.
+            </p>
+          </div>
+
+          <div class="profile-grid">
+
+            <article class="profile-card">
+              <h3>Members</h3>
+              <p id="ov-members">—</p>
+            </article>
+
+            <article class="profile-card">
+              <h3>Silks and juniors</h3>
+              <p id="ov-membership">—</p>
+            </article>
+
+            <article class="profile-card">
+              <h3>Circuit or region</h3>
+              <p id="ov-circuit">—</p>
+            </article>
+
+          </div>
+
+          <div
+            id="ov-links"
+            class="profile-links"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-practice-areas"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Areas of work
+            </p>
+
+            <h2>
+              Practice areas
+            </h2>
+
+            <p class="tab-intro">
+              The legal practice areas listed by the chambers on its
+              official website.
+            </p>
+          </div>
+
+          <div
+            id="practiceAreasList"
+            class="profile-list"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-pupillage"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Bar training
+            </p>
+
+            <h2>
+              Pupillage
+            </h2>
+
+            <p class="tab-intro">
+              Pupillage places, application dates, eligibility,
+              selection stages, structure and tenancy information.
+            </p>
+          </div>
+
+          <div
+            id="pupillageList"
+            class="profile-list"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-mini-pupillage"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Work experience
+            </p>
+
+            <h2>
+              Mini-pupillage
+            </h2>
+
+            <p class="tab-intro">
+              Assessed and unassessed mini-pupillage opportunities,
+              eligibility, dates and application information.
+            </p>
+          </div>
+
+          <div
+            id="miniPupillageList"
+            class="profile-list"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-funding"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Financial information
+            </p>
+
+            <h2>
+              Funding and support
+            </h2>
+
+            <p class="tab-intro">
+              Pupillage awards, drawdown, guaranteed earnings,
+              expenses and other financial support where confirmed.
+            </p>
+          </div>
+
+          <div
+            id="fundingList"
+            class="profile-list"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-locations"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Chambers and circuits
+            </p>
+
+            <h2>
+              Locations
+            </h2>
+
+            <p class="tab-intro">
+              Principal chambers, regional locations, circuits and
+              accessibility information where published.
+            </p>
+          </div>
+
+          <div
+            id="locationsList"
+            class="profile-list"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-accessibility"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Candidate support
+            </p>
+
+            <h2>
+              Equality, diversity and accessibility
+            </h2>
+
+            <p class="tab-intro">
+              Official information about inclusive recruitment,
+              reasonable adjustments, social mobility and candidate
+              accessibility.
+            </p>
+          </div>
+
+          <div
+            id="accessibilityList"
+            class="profile-list"
+          ></div>
+        </section>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+
+      <a
+        href="index.html"
+        class="brand small"
+        aria-label="Vacatory home"
+      >
+        <svg
+          class="brand-mark"
+          viewBox="0 0 28 28"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 4 L14 24"
+            class="logo-stroke-left"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+
+          <path
+            d="M24 4 L14 24"
+            class="logo-stroke-right"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+        </svg>
+
+        <span class="brand-word">acatory</span>
+      </a>
+
+      <p class="footer-statement">
+        © 2026 Vacatory
+      </p>
+
+      <div class="footer-links">
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script defer src="supabase.js"></script>
+  <script defer src="chamber-profile.js?v=1"></script>
+  <script defer src="theme.js?v=2"></script>
+</body>
+</html>
