@@ -56,8 +56,7 @@ async function loadFirmProfile() {
       loadPracticeAreas(),
       loadRoles(),
       loadLocations(firm),
-      loadVacationSchemes(firm),
-      loadTrainingContracts(firm)
+      loadOpportunities(firm)
     ]);
 
     document
@@ -76,6 +75,10 @@ async function loadFirmProfile() {
     showError();
   }
 }
+
+/* =======================================
+   Header
+======================================= */
 
 function renderFirmHeader(firm) {
   document.title = `${firm.name || "Firm"} — Vacatory`;
@@ -165,8 +168,7 @@ function renderFirmHeader(firm) {
       );
     }
 
-    firmMeta.innerHTML =
-      metaItems.join("");
+    firmMeta.innerHTML = metaItems.join("");
   }
 
   setText(
@@ -230,12 +232,14 @@ function renderOfficialLinks(firm) {
 
   links.innerHTML = linkItems.length
     ? linkItems.join("")
-    : `
-      <p class="loading">
-        Official links have not yet been added.
-      </p>
-    `;
+    : emptyMessage(
+        "Official links have not yet been added."
+      );
 }
+
+/* =======================================
+   Tabs
+======================================= */
 
 function setupTabs() {
   const tabs =
@@ -258,13 +262,16 @@ function setupTabs() {
 
       tab.classList.add("active");
 
-      const targetPanel =
-        document.getElementById(`tab-${target}`);
-
-      targetPanel?.classList.add("active");
+      document
+        .getElementById(`tab-${target}`)
+        ?.classList.add("active");
     });
   });
 }
+
+/* =======================================
+   Practice areas
+======================================= */
 
 async function loadPracticeAreas() {
   const container =
@@ -280,14 +287,6 @@ async function loadPracticeAreas() {
     firmId
   );
 
-  if (!rows.length) {
-    container.innerHTML = emptyMessage(
-      "No practice areas have been listed yet."
-    );
-
-    return;
-  }
-
   const practiceAreas = rows
     .map(row => ({
       name:
@@ -295,10 +294,12 @@ async function loadPracticeAreas() {
         row.practice_name ||
         row.service_name ||
         row.name,
+
       description:
         row.description ||
         row.summary ||
         "",
+
       featured:
         Boolean(row.featured)
     }))
@@ -342,6 +343,10 @@ async function loadPracticeAreas() {
     .join("");
 }
 
+/* =======================================
+   Roles
+======================================= */
+
 async function loadRoles() {
   const container =
     document.getElementById("rolesList");
@@ -383,6 +388,10 @@ async function loadRoles() {
     </ul>
   `;
 }
+
+/* =======================================
+   Locations
+======================================= */
 
 async function loadLocations(firm) {
   const container =
@@ -501,339 +510,679 @@ async function loadLocations(firm) {
     .join("");
 }
 
-async function loadVacationSchemes(firm) {
-  const container =
-    document.getElementById("vacationSchemesList");
+/* =======================================
+   Combined opportunities
+======================================= */
 
-  if (!container) {
+async function loadOpportunities(firm) {
+  const list =
+    document.getElementById("opportunitiesList");
+
+  const loading =
+    document.getElementById("opportunitiesLoading");
+
+  const empty =
+    document.getElementById("opportunitiesEmpty");
+
+  if (!list) {
     return;
   }
 
-  const rows = await readOptionalRows(
-    "vacation_schemes",
-    "firm_id",
-    firmId
-  );
+  const [
+    vacationSchemes,
+    trainingContracts
+  ] = await Promise.all([
+    readOptionalRows(
+      "vacation_schemes",
+      "firm_id",
+      firmId
+    ),
 
-  const sortedRows = [...rows].sort(
-    (first, second) =>
-      dateValue(
-        first.deadline ||
-        first.application_close_date ||
-        first.closes_on
-      ) -
-      dateValue(
-        second.deadline ||
-        second.application_close_date ||
-        second.closes_on
-      )
-  );
+    readOptionalRows(
+      "training_contracts",
+      "firm_id",
+      firmId
+    )
+  ]);
 
-  if (!sortedRows.length) {
-    container.innerHTML = firm.careers_url
-      ? `
-        <p class="loading">
-          No vacation-scheme records have been added yet.
-          ${profileLink(
-            firm.careers_url,
-            "Visit the official careers page"
-          )}
-        </p>
-      `
-      : emptyMessage(
-          "No vacation-scheme records have been added yet."
-        );
+  const opportunities = [
+    ...vacationSchemes.map(row =>
+      normaliseVacationScheme(row, firm)
+    ),
 
-    return;
-  }
+    ...trainingContracts.map(row =>
+      normaliseTrainingContract(row, firm)
+    )
+  ]
+    .filter(Boolean)
+    .sort(sortOpportunitiesByClosingDate);
 
-  container.innerHTML = sortedRows
-    .map(scheme => {
-      const schemeName =
-        scheme.scheme_name ||
-        scheme.opportunity_name ||
-        scheme.programme_name ||
-        "Vacation scheme";
+  loading?.classList.add("hidden");
 
-      const schemeType =
-        scheme.scheme_type ||
-        scheme.opportunity_type ||
-        "";
+  if (!opportunities.length) {
+    empty?.classList.remove("hidden");
+    list.innerHTML = "";
 
-      const location =
-        scheme.location ||
-        scheme.location_text ||
-        "";
+    if (firm.careers_url) {
+      empty.innerHTML = `
+        No opportunities have been added for this firm yet.
 
-      const applicationOpen =
-        scheme.opens_on ||
-        scheme.application_open ||
-        scheme.application_open_date;
-
-      const applicationDeadline =
-        scheme.deadline ||
-        scheme.application_deadline ||
-        scheme.application_close_date ||
-        scheme.closes_on;
-
-      const programmeDates =
-        scheme.programme_dates ||
-        scheme.scheme_dates ||
-        scheme.actual_programme_dates ||
-        "";
-
-      const applicationLink =
-        scheme.application_link ||
-        scheme.application_url ||
-        firm.careers_url;
-
-      return `
-        <article class="profile-card application-card">
-          <h3>
-            ${escapeHtml(schemeName)}
-          </h3>
-
-          ${
-            schemeType || location
-              ? `
-                <p>
-                  ${escapeHtml(schemeType)}
-                  ${
-                    schemeType && location
-                      ? " — "
-                      : ""
-                  }
-                  ${escapeHtml(location)}
-                </p>
-              `
-              : ""
-          }
-
-          <div class="profile-fact-grid">
-            ${fact(
-              "Applications open",
-              formatDate(applicationOpen)
-            )}
-
-            ${fact(
-              "Application deadline",
-              formatDate(applicationDeadline)
-            )}
-
-            ${fact(
-              "Programme dates",
-              formatDisplayValue(programmeDates)
-            )}
-
-            ${fact(
-              "Duration",
-              scheme.duration ||
-              scheme.programme_length
-            )}
-
-            ${fact(
-              "Salary",
-              scheme.salary ||
-              scheme.payment
-            )}
-
-            ${fact(
-              "Status",
-              scheme.application_status ||
-              scheme.status
-            )}
-          </div>
-
-          ${
-            scheme.eligibility
-              ? `
-                <p class="profile-eligibility">
-                  <strong>Eligibility:</strong>
-                  ${escapeHtml(scheme.eligibility)}
-                </p>
-              `
-              : ""
-          }
-
-          ${
-            applicationLink
-              ? profileLink(
-                  applicationLink,
-                  "Official application information"
-                )
-              : ""
-          }
-        </article>
+        ${profileLink(
+          firm.careers_url,
+          "Visit the official careers page"
+        )}
       `;
-    })
+    }
+
+    return;
+  }
+
+  empty?.classList.add("hidden");
+
+  list.innerHTML = opportunities
+    .map((opportunity, index) =>
+      renderOpportunity(
+        opportunity,
+        index
+      )
+    )
     .join("");
 }
 
-async function loadTrainingContracts(firm) {
-  const container =
-    document.getElementById("trainingContractList");
+function normaliseVacationScheme(row, firm) {
+  const name =
+    row.scheme_name ||
+    row.opportunity_name ||
+    row.programme_name ||
+    "Vacation scheme";
 
-  if (!container) {
-    return;
+  const type =
+    row.scheme_type ||
+    row.opportunity_type ||
+    "Vacation scheme";
+
+  const location =
+    row.location ||
+    row.location_text ||
+    row.office ||
+    "Location not stated";
+
+  const openingDate =
+    row.opens_on ||
+    row.application_open ||
+    row.application_open_date;
+
+  const closingDate =
+    row.deadline ||
+    row.application_deadline ||
+    row.application_close_date ||
+    row.closes_on;
+
+  const startDate =
+    row.programme_start_date ||
+    row.start_date ||
+    row.scheme_start_date;
+
+  const programmeDates =
+    row.programme_dates ||
+    row.scheme_dates ||
+    row.actual_programme_dates;
+
+  return {
+    sourceType: "vacation-scheme",
+    name,
+    type,
+    location,
+    openingDate,
+    closingDate,
+    startDate,
+    programmeDates,
+
+    status:
+      row.application_status ||
+      row.status,
+
+    duration:
+      row.duration ||
+      row.programme_length,
+
+    salary:
+      row.salary ||
+      row.payment,
+
+    eligibility:
+      row.eligibility,
+
+    academicRequirements:
+      row.academic_requirements ||
+      row.academic_requirement,
+
+    degreeRequirements:
+      row.degree_requirements ||
+      row.degree_requirement,
+
+    applicationProcess:
+      row.application_process ||
+      row.selection_process ||
+      row.application_stages,
+
+    assessments:
+      row.assessments ||
+      row.assessment_details ||
+      row.online_tests,
+
+    additionalDetails:
+      row.additional_details ||
+      row.notes ||
+      row.description,
+
+    applicationUrl:
+      row.application_link ||
+      row.application_url ||
+      firm.careers_url
+  };
+}
+
+function normaliseTrainingContract(row, firm) {
+  const intake =
+    row.intake_year ||
+    row.start_year ||
+    "";
+
+  const baseName =
+    row.programme_name ||
+    row.training_contract_name ||
+    "Training contract";
+
+  const name = intake
+    ? `${baseName} — ${intake} intake`
+    : baseName;
+
+  return {
+    sourceType: "training-contract",
+    name,
+
+    type:
+      row.contract_type ||
+      row.opportunity_type ||
+      "Training contract",
+
+    location:
+      row.location ||
+      row.location_text ||
+      row.office ||
+      "Location not stated",
+
+    openingDate:
+      row.application_open ||
+      row.application_open_date,
+
+    closingDate:
+      row.application_deadline ||
+      row.application_close_date,
+
+    startDate:
+      row.start_date ||
+      row.programme_start_date,
+
+    programmeDates:
+      row.programme_dates,
+
+    status:
+      row.application_status ||
+      row.status,
+
+    duration:
+      row.duration,
+
+    firstYearSalary:
+      row.salary_first_year,
+
+    secondYearSalary:
+      row.salary_second_year,
+
+    nqSalary:
+      row.salary_qualification ||
+      row.nq_salary,
+
+    seats:
+      row.seats ||
+      row.number_of_seats,
+
+    eligibility:
+      row.eligibility,
+
+    academicRequirements:
+      row.academic_requirements ||
+      row.academic_requirement,
+
+    degreeRequirements:
+      row.degree_requirements ||
+      row.degree_requirement,
+
+    applicationProcess:
+      row.application_process ||
+      row.selection_process ||
+      row.application_stages,
+
+    assessments:
+      row.assessments ||
+      row.assessment_details ||
+      row.online_tests,
+
+    sponsorship:
+      row.sponsorship ||
+      row.sqe_support ||
+      row.study_support,
+
+    visaInformation:
+      row.visa_sponsorship ||
+      row.visa_information ||
+      row.right_to_work,
+
+    additionalDetails:
+      row.additional_details ||
+      row.notes ||
+      row.description,
+
+    applicationUrl:
+      row.application_link ||
+      row.application_url ||
+      firm.careers_url
+  };
+}
+
+function sortOpportunitiesByClosingDate(
+  first,
+  second
+) {
+  const firstGroup =
+    closingDateGroup(first.closingDate);
+
+  const secondGroup =
+    closingDateGroup(second.closingDate);
+
+  if (firstGroup !== secondGroup) {
+    return firstGroup - secondGroup;
   }
 
-  const rows = await readOptionalRows(
-    "training_contracts",
-    "firm_id",
-    firmId
-  );
+  const firstDate =
+    dateValue(first.closingDate);
 
-  const sortedRows = [...rows].sort(
-    (first, second) =>
-      dateValue(
-        first.application_deadline ||
-        first.application_close_date
-      ) -
-      dateValue(
-        second.application_deadline ||
-        second.application_close_date
-      )
-  );
+  const secondDate =
+    dateValue(second.closingDate);
 
-  if (!sortedRows.length) {
-    container.innerHTML = firm.careers_url
-      ? `
-        <p class="loading">
-          No training-contract records have been added yet.
-          ${profileLink(
-            firm.careers_url,
-            "Visit the official careers page"
-          )}
-        </p>
-      `
-      : emptyMessage(
-          "No training-contract records have been added yet."
-        );
-
-    return;
+  if (firstGroup === 2) {
+    return secondDate - firstDate;
   }
 
-  container.innerHTML = sortedRows
-    .map(contract => {
-      const programmeName =
-        contract.programme_name ||
-        contract.training_contract_name ||
-        "Training contract";
+  if (firstDate !== secondDate) {
+    return firstDate - secondDate;
+  }
 
-      const intake =
-        contract.intake_year ||
-        contract.start_year ||
-        "";
+  return first.name.localeCompare(second.name);
+}
 
-      const applicationOpen =
-        contract.application_open ||
-        contract.application_open_date;
+function closingDateGroup(value) {
+  if (!value || !isValidDate(value)) {
+    return 1;
+  }
 
-      const applicationDeadline =
-        contract.application_deadline ||
-        contract.application_close_date;
+  const today = startOfToday();
+  const date = startOfDate(value);
 
-      const startDate =
-        contract.start_date ||
-        contract.programme_start_date;
+  return date >= today ? 0 : 2;
+}
 
-      const applicationLink =
-        contract.application_link ||
-        contract.application_url ||
-        firm.careers_url;
+function renderOpportunity(
+  opportunity,
+  index
+) {
+  const deadline =
+    formatDate(opportunity.closingDate) ||
+    "Not announced";
 
-      return `
-        <article class="profile-card application-card">
+  const startDate =
+    formatOpportunityStart(opportunity) ||
+    "Not announced";
+
+  const detailSections =
+    buildOpportunityDetailSections(
+      opportunity
+    );
+
+  const facts =
+    buildOpportunityFacts(
+      opportunity
+    );
+
+  return `
+    <details
+      class="opportunity-item"
+      ${index === 0 ? "open" : ""}
+    >
+      <summary class="opportunity-summary">
+
+        <div class="opportunity-deadline">
+          <span>Closing</span>
+          <strong>${escapeHtml(deadline)}</strong>
+        </div>
+
+        <div class="opportunity-summary-main">
           <h3>
-            ${escapeHtml(programmeName)}
-            ${
-              intake
-                ? ` — ${escapeHtml(intake)} intake`
-                : ""
-            }
+            ${escapeHtml(opportunity.name)}
           </h3>
 
-          ${
-            contract.location
-              ? `<p>${escapeHtml(contract.location)}</p>`
-              : ""
-          }
+          <div class="opportunity-summary-meta">
+            <span>
+              <strong>Type:</strong>
+              ${escapeHtml(opportunity.type)}
+            </span>
 
-          <div class="profile-fact-grid">
-            ${fact(
-              "Applications open",
-              formatDate(applicationOpen)
-            )}
+            <span>
+              <strong>Location:</strong>
+              ${escapeHtml(opportunity.location)}
+            </span>
 
-            ${fact(
-              "Application deadline",
-              formatDate(applicationDeadline)
-            )}
-
-            ${fact(
-              "Start date",
-              formatDate(startDate)
-            )}
-
-            ${fact(
-              "First-year salary",
-              formatMoney(
-                contract.salary_first_year
-              )
-            )}
-
-            ${fact(
-              "Second-year salary",
-              formatMoney(
-                contract.salary_second_year
-              )
-            )}
-
-            ${fact(
-              "NQ salary",
-              formatMoney(
-                contract.salary_qualification ||
-                contract.nq_salary
-              )
-            )}
-
-            ${fact(
-              "Seats",
-              contract.seats ||
-              contract.number_of_seats
-            )}
-
-            ${fact(
-              "Status",
-              contract.application_status ||
-              contract.status
-            )}
+            <span>
+              <strong>Starts:</strong>
+              ${escapeHtml(startDate)}
+            </span>
           </div>
+        </div>
 
-          ${
-            contract.eligibility
-              ? `
-                <p class="profile-eligibility">
-                  <strong>Eligibility:</strong>
-                  ${escapeHtml(contract.eligibility)}
-                </p>
-              `
-              : ""
-          }
+        <span
+          class="opportunity-chevron"
+          aria-hidden="true"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
+        </span>
 
-          ${
-            applicationLink
-              ? profileLink(
-                  applicationLink,
-                  "Official application information"
-                )
-              : ""
-          }
-        </article>
-      `;
-    })
-    .join("");
+      </summary>
+
+      <div class="opportunity-expanded">
+
+        ${
+          facts
+            ? `
+              <div class="opportunity-facts">
+                ${facts}
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          detailSections.length
+            ? `
+              <div class="opportunity-detail-sections">
+                ${detailSections.join("")}
+              </div>
+            `
+            : `
+              <p class="opportunity-no-details">
+                Further details have not yet been added.
+              </p>
+            `
+        }
+
+        ${
+          opportunity.applicationUrl
+            ? `
+              <div class="opportunity-link-panel">
+                ${profileLink(
+                  opportunity.applicationUrl,
+                  "View official opportunity page"
+                )}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+    </details>
+  `;
 }
+
+function buildOpportunityFacts(opportunity) {
+  const facts = [
+    fact(
+      "Applications open",
+      formatDate(opportunity.openingDate)
+    ),
+
+    fact(
+      "Closing date",
+      formatDate(opportunity.closingDate)
+    ),
+
+    fact(
+      "Start date",
+      formatDate(opportunity.startDate)
+    ),
+
+    fact(
+      "Programme dates",
+      formatDisplayValue(
+        opportunity.programmeDates
+      )
+    ),
+
+    fact(
+      "Duration",
+      opportunity.duration
+    ),
+
+    fact(
+      "Status",
+      opportunity.status
+    ),
+
+    fact(
+      "Salary",
+      opportunity.salary
+    ),
+
+    fact(
+      "First-year salary",
+      formatMoney(
+        opportunity.firstYearSalary
+      )
+    ),
+
+    fact(
+      "Second-year salary",
+      formatMoney(
+        opportunity.secondYearSalary
+      )
+    ),
+
+    fact(
+      "NQ salary",
+      formatMoney(
+        opportunity.nqSalary
+      )
+    ),
+
+    fact(
+      "Seats",
+      opportunity.seats
+    )
+  ].filter(Boolean);
+
+  return facts.join("");
+}
+
+function buildOpportunityDetailSections(
+  opportunity
+) {
+  const sections = [];
+
+  addBulletSection(
+    sections,
+    "Eligibility",
+    opportunity.eligibility
+  );
+
+  addBulletSection(
+    sections,
+    "Academic requirements",
+    opportunity.academicRequirements
+  );
+
+  addBulletSection(
+    sections,
+    "Degree requirements",
+    opportunity.degreeRequirements
+  );
+
+  addBulletSection(
+    sections,
+    "Application process",
+    opportunity.applicationProcess
+  );
+
+  addBulletSection(
+    sections,
+    "Assessments",
+    opportunity.assessments
+  );
+
+  addBulletSection(
+    sections,
+    "Study support and sponsorship",
+    opportunity.sponsorship
+  );
+
+  addBulletSection(
+    sections,
+    "Visa and right-to-work information",
+    opportunity.visaInformation
+  );
+
+  addBulletSection(
+    sections,
+    "Further information",
+    opportunity.additionalDetails
+  );
+
+  return sections;
+}
+
+function addBulletSection(
+  sections,
+  heading,
+  value
+) {
+  const points = splitIntoBulletPoints(value);
+
+  if (!points.length) {
+    return;
+  }
+
+  sections.push(`
+    <section class="opportunity-detail-section">
+      <h4>${escapeHtml(heading)}</h4>
+
+      <ul class="opportunity-bullets">
+        ${points
+          .map(point => `
+            <li>${escapeHtml(point)}</li>
+          `)
+          .join("")}
+      </ul>
+    </section>
+  `);
+}
+
+function splitIntoBulletPoints(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return uniqueCleanPoints(
+      value.flatMap(splitIntoBulletPoints)
+    );
+  }
+
+  if (typeof value === "object") {
+    return uniqueCleanPoints(
+      Object.values(value)
+        .flatMap(splitIntoBulletPoints)
+    );
+  }
+
+  const text = String(value)
+    .replace(/\r/g, "\n")
+    .replace(/[•●▪◦]/g, "\n")
+    .replace(/\s+-\s+/g, "\n")
+    .replace(/;\s+/g, "\n")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+
+  let points = text
+    .split("\n")
+    .map(cleanBulletPoint)
+    .filter(Boolean);
+
+  if (points.length === 1) {
+    points = points[0]
+      .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
+      .map(cleanBulletPoint)
+      .filter(Boolean);
+  }
+
+  return uniqueCleanPoints(points);
+}
+
+function cleanBulletPoint(value) {
+  return String(value || "")
+    .replace(/^[\s\-–—:;,.]+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function uniqueCleanPoints(points) {
+  return [
+    ...new Set(
+      points
+        .map(cleanBulletPoint)
+        .filter(Boolean)
+    )
+  ];
+}
+
+function formatOpportunityStart(opportunity) {
+  if (opportunity.startDate) {
+    return formatDate(
+      opportunity.startDate
+    );
+  }
+
+  if (opportunity.programmeDates) {
+    return formatDisplayValue(
+      opportunity.programmeDates
+    );
+  }
+
+  return "";
+}
+
+/* =======================================
+   Data helpers
+======================================= */
 
 async function readOptionalRows(
   tableName,
@@ -914,6 +1263,10 @@ function deduplicateLocations(rows) {
   );
 }
 
+/* =======================================
+   Shared display helpers
+======================================= */
+
 function fact(label, value) {
   if (
     value === null ||
@@ -930,7 +1283,9 @@ function fact(label, value) {
       </span>
 
       <span class="fact-value">
-        ${escapeHtml(value)}
+        ${escapeHtml(
+          formatDisplayValue(value)
+        )}
       </span>
     </div>
   `;
@@ -981,6 +1336,157 @@ function metaPill(icon, text) {
   `;
 }
 
+function setText(id, value) {
+  const element =
+    document.getElementById(id);
+
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function formatDisplayValue(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return "";
+  }
+
+  if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+
+  if (typeof value === "object") {
+    return Object.values(value)
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  if (value === true) {
+    return "Yes";
+  }
+
+  if (value === false) {
+    return "No";
+  }
+
+  return String(value);
+}
+
+function formatMoney(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return "";
+  }
+
+  const number = Number(value);
+
+  if (Number.isNaN(number)) {
+    return String(value);
+  }
+
+  return `£${number.toLocaleString("en-GB")}`;
+}
+
+function dateValue(value) {
+  if (!value) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  const timestamp =
+    new Date(value).getTime();
+
+  return Number.isNaN(timestamp)
+    ? Number.POSITIVE_INFINITY
+    : timestamp;
+}
+
+function isValidDate(value) {
+  return !Number.isNaN(
+    new Date(value).getTime()
+  );
+}
+
+function startOfToday() {
+  const date = new Date();
+
+  date.setHours(0, 0, 0, 0);
+
+  return date.getTime();
+}
+
+function startOfDate(value) {
+  const date = new Date(value);
+
+  date.setHours(0, 0, 0, 0);
+
+  return date.getTime();
+}
+
+function isTrue(value) {
+  return (
+    value === true ||
+    value === "true" ||
+    value === 1 ||
+    value === "1"
+  );
+}
+
+function uniqueSorted(values) {
+  return [
+    ...new Set(
+      values
+        .filter(Boolean)
+        .map(value => String(value).trim())
+        .filter(Boolean)
+    )
+  ].sort((first, second) =>
+    first.localeCompare(second)
+  );
+}
+
+function normaliseText(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+/* =======================================
+   Icons
+======================================= */
+
 function locationIcon() {
   return `
     <svg
@@ -1023,115 +1529,4 @@ function linkIcon() {
       <path d="M14 11a5 5 0 0 0-7.1 0L4.8 13.1a5 5 0 0 0 7.1 7.1L13 19.1"></path>
     </svg>
   `;
-}
-
-function setText(id, value) {
-  const element =
-    document.getElementById(id);
-
-  if (element) {
-    element.textContent = value;
-  }
-}
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return String(value);
-  }
-
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  });
-}
-
-function formatDisplayValue(value) {
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
-    return "";
-  }
-
-  if (Array.isArray(value)) {
-    return value.join(", ");
-  }
-
-  return String(value);
-}
-
-function formatMoney(value) {
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
-    return "";
-  }
-
-  const number = Number(value);
-
-  if (Number.isNaN(number)) {
-    return String(value);
-  }
-
-  return `£${number.toLocaleString("en-GB")}`;
-}
-
-function dateValue(value) {
-  if (!value) {
-    return Number.POSITIVE_INFINITY;
-  }
-
-  const timestamp =
-    new Date(value).getTime();
-
-  return Number.isNaN(timestamp)
-    ? Number.POSITIVE_INFINITY
-    : timestamp;
-}
-
-function isTrue(value) {
-  return (
-    value === true ||
-    value === "true" ||
-    value === 1 ||
-    value === "1"
-  );
-}
-
-function uniqueSorted(values) {
-  return [
-    ...new Set(
-      values
-        .filter(Boolean)
-        .map(value => String(value).trim())
-        .filter(Boolean)
-    )
-  ].sort((first, second) =>
-    first.localeCompare(second)
-  );
-}
-
-function normaliseText(value) {
-  return String(value || "")
-    .trim()
-    .toLowerCase();
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
