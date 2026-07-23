@@ -38,13 +38,13 @@ async function loadChamberProfile() {
 
     renderChamberHeader(chamber);
 
-    const opportunities = await loadChamberOpportunities(chamber);
+    const opportunities =
+      await loadChamberOpportunityRows(chamber);
 
     await Promise.all([
       loadPracticeAreas(chamber),
       loadLocations(chamber),
-      loadPupillages(chamber, opportunities),
-      loadMiniPupillages(chamber, opportunities),
+      loadOpportunities(chamber, opportunities),
       loadFunding(chamber, opportunities),
       loadAccessibility(chamber)
     ]);
@@ -61,7 +61,11 @@ async function loadChamberProfile() {
       .getElementById("profileContent")
       ?.classList.remove("hidden");
   } catch (error) {
-    console.error("Unable to load chambers profile:", error);
+    console.error(
+      "Unable to load chambers profile:",
+      error
+    );
+
     showProfileError();
   }
 }
@@ -80,9 +84,16 @@ function showProfileError() {
     ?.classList.remove("hidden");
 }
 
+/* =======================================
+   Tabs
+======================================= */
+
 function setupProfileTabs() {
-  const tabs = document.querySelectorAll(".tab-btn");
-  const panels = document.querySelectorAll(".tab-panel");
+  const tabs =
+    document.querySelectorAll(".tab-btn");
+
+  const panels =
+    document.querySelectorAll(".tab-panel");
 
   tabs.forEach(tab => {
     tab.addEventListener("click", () => {
@@ -105,6 +116,10 @@ function setupProfileTabs() {
   });
 }
 
+/* =======================================
+   Header
+======================================= */
+
 function getChamberName(chamber) {
   return (
     chamber.name ||
@@ -120,12 +135,20 @@ function renderChamberHeader(chamber) {
 
   document.title = `${name} — Vacatory`;
 
-  const logo = document.getElementById("chambersLogo");
-  const nameElement = document.getElementById("chambersName");
-  const typeElement = document.getElementById("chambersType");
+  const logo =
+    document.getElementById("chambersLogo");
+
+  const nameElement =
+    document.getElementById("chambersName");
+
+  const typeElement =
+    document.getElementById("chambersType");
+
   const overviewElement =
     document.getElementById("chambersOverview");
-  const metaElement = document.getElementById("chambersMeta");
+
+  const metaElement =
+    document.getElementById("chambersMeta");
 
   if (logo) {
     const initial = (
@@ -176,7 +199,10 @@ function renderChamberHeader(chamber) {
 
     if (location) {
       items.push(
-        metaPill(locationIcon(), location)
+        metaPill(
+          locationIcon(),
+          location
+        )
       );
     }
 
@@ -184,12 +210,16 @@ function renderChamberHeader(chamber) {
       items.push(
         metaPill(
           circuitIcon(),
-          chamber.circuit || chamber.region
+          chamber.circuit ||
+          chamber.region
         )
       );
     }
 
-    if (chamber.website || chamber.website_url) {
+    if (
+      chamber.website ||
+      chamber.website_url
+    ) {
       items.push(
         metaPill(
           linkIcon(),
@@ -224,7 +254,11 @@ function renderOverviewFacts(chamber) {
 
   const membershipParts = [];
 
-  if (silks !== null && silks !== undefined && silks !== "") {
+  if (
+    silks !== null &&
+    silks !== undefined &&
+    silks !== ""
+  ) {
     membershipParts.push(`${silks} silks`);
   }
 
@@ -239,8 +273,8 @@ function renderOverviewFacts(chamber) {
   setText(
     "ov-members",
     totalMembers !== null &&
-      totalMembers !== undefined &&
-      totalMembers !== ""
+    totalMembers !== undefined &&
+    totalMembers !== ""
       ? String(totalMembers)
       : "Not yet available"
   );
@@ -255,13 +289,14 @@ function renderOverviewFacts(chamber) {
   setText(
     "ov-circuit",
     chamber.circuit ||
-      chamber.region ||
-      "Not yet available"
+    chamber.region ||
+    "Not yet available"
   );
 }
 
 function renderOfficialLinks(chamber) {
-  const container = document.getElementById("ov-links");
+  const container =
+    document.getElementById("ov-links");
 
   if (!container) {
     return;
@@ -317,6 +352,10 @@ function renderOfficialLinks(chamber) {
       );
 }
 
+/* =======================================
+   Practice areas
+======================================= */
+
 async function loadPracticeAreas(chamber) {
   const container =
     document.getElementById("practiceAreasList");
@@ -359,6 +398,7 @@ async function loadPracticeAreas(chamber) {
         row.practice_name ||
         row.service_name ||
         row.name,
+
       description:
         row.description ||
         row.summary ||
@@ -384,6 +424,7 @@ async function loadPracticeAreas(chamber) {
     container.innerHTML = emptyMessage(
       "No practice areas have been listed yet."
     );
+
     return;
   }
 
@@ -401,6 +442,10 @@ async function loadPracticeAreas(chamber) {
     `)
     .join("");
 }
+
+/* =======================================
+   Locations
+======================================= */
 
 async function loadLocations(chamber) {
   const container =
@@ -424,13 +469,18 @@ async function loadLocations(chamber) {
       chamber.principal_location ||
       chamber.city ||
       chamber.location,
-    country: chamber.country,
+
+    country:
+      chamber.country,
+
     region:
       chamber.circuit ||
       chamber.region,
+
     address:
       chamber.principal_address ||
       chamber.address,
+
     accessibility:
       chamber.premises_accessibility ||
       chamber.accessibility_information
@@ -457,7 +507,9 @@ async function loadLocations(chamber) {
         location.office_address ||
         "";
 
-      return normaliseText(`${city}|${address}`);
+      return normaliseText(
+        `${city}|${address}`
+      );
     }
   );
 
@@ -465,6 +517,7 @@ async function loadLocations(chamber) {
     container.innerHTML = emptyMessage(
       "No chambers locations have been listed yet."
     );
+
     return;
   }
 
@@ -477,7 +530,9 @@ async function loadLocations(chamber) {
         location.name ||
         "Chambers";
 
-      const country = location.country || "";
+      const country =
+        location.country || "";
+
       const region =
         location.circuit ||
         location.region ||
@@ -533,7 +588,11 @@ async function loadLocations(chamber) {
     .join("");
 }
 
-async function loadChamberOpportunities(chamber) {
+/* =======================================
+   Opportunity data
+======================================= */
+
+async function loadChamberOpportunityRows(chamber) {
   const rows = [];
 
   rows.push(
@@ -587,351 +646,665 @@ async function loadChamberOpportunities(chamber) {
   );
 }
 
-async function loadPupillages(chamber, opportunities) {
-  const container =
-    document.getElementById("pupillageList");
+/* =======================================
+   Combined opportunities
+======================================= */
 
-  if (!container) {
+async function loadOpportunities(
+  chamber,
+  opportunityRows
+) {
+  const list =
+    document.getElementById("opportunitiesList");
+
+  const loading =
+    document.getElementById("opportunitiesLoading");
+
+  const empty =
+    document.getElementById("opportunitiesEmpty");
+
+  if (!list) {
     return;
   }
 
-  const pupillages = opportunities.filter(row => {
-    const type = getOpportunityType(row);
+  const opportunities = opportunityRows
+    .map(row =>
+      normaliseChamberOpportunity(
+        row,
+        chamber
+      )
+    )
+    .filter(Boolean)
+    .sort(sortOpportunitiesByClosingDate);
 
-    return type === "pupillage";
-  });
+  loading?.classList.add("hidden");
 
-  if (!pupillages.length) {
-    const url =
+  if (!opportunities.length) {
+    empty?.classList.remove("hidden");
+    list.innerHTML = "";
+
+    const fallbackUrl =
       chamber.pupillage_url ||
       chamber.pupillage_page ||
-      chamber.recruitment_url;
+      chamber.mini_pupillage_url ||
+      chamber.mini_pupillage_page ||
+      chamber.recruitment_url ||
+      chamber.website ||
+      chamber.website_url;
 
-    container.innerHTML = url
-      ? `
-        ${emptyMessage(
-          "No structured pupillage record has been added yet."
-        )}
+    if (fallbackUrl) {
+      empty.innerHTML = `
+        No structured opportunity records have been added yet.
+
         ${profileLink(
-          url,
-          "Visit the official pupillage page"
+          fallbackUrl,
+          "Visit the official recruitment page"
         )}
-      `
-      : emptyMessage(
-          "No pupillage record has been added yet."
-        );
+      `;
+    }
 
     return;
   }
 
-  container.innerHTML = pupillages
-    .map(renderPupillageCard)
+  empty?.classList.add("hidden");
+
+  list.innerHTML = opportunities
+    .map(renderOpportunity)
     .join("");
 }
 
-function renderPupillageCard(row) {
+function normaliseChamberOpportunity(
+  row,
+  chamber
+) {
+  const typeCode =
+    getOpportunityType(row);
+
+  if (!typeCode) {
+    return null;
+  }
+
+  const defaultName =
+    typeCode === "pupillage"
+      ? "Pupillage"
+      : typeCode === "assessed_mini_pupillage"
+        ? "Assessed mini-pupillage"
+        : "Mini-pupillage";
+
+  const defaultType =
+    typeCode === "pupillage"
+      ? "Pupillage"
+      : typeCode === "assessed_mini_pupillage"
+        ? "Assessed mini-pupillage"
+        : "Mini-pupillage";
+
   const name =
     row.scheme_name ||
     row.opportunity_name ||
     row.programme_name ||
     row.official_name ||
-    "Pupillage";
+    defaultName;
 
-  const openingDate =
-    row.application_open_date ||
-    row.application_open ||
-    row.opens_on ||
-    row.opening_date;
-
-  const closingDate =
-    row.application_close_date ||
-    row.application_deadline ||
-    row.deadline ||
-    row.closes_on;
-
-  const startDate =
-    row.start_date ||
-    row.programme_start_date ||
-    row.pupillage_start_date;
-
-  const award =
-    row.pupillage_award ||
-    row.award_amount ||
-    row.funding_amount ||
-    row.salary ||
-    row.payment;
-
-  const places =
-    row.number_of_places ||
-    row.number_of_pupillages ||
-    row.places;
+  const location =
+    row.location ||
+    row.location_text ||
+    row.city ||
+    chamber.principal_location ||
+    chamber.principal_city ||
+    chamber.city ||
+    "Location not stated";
 
   const applicationUrl =
     row.application_url ||
     row.application_link ||
     row.official_url ||
-    row.source_url;
+    row.source_url ||
+    (
+      typeCode === "pupillage"
+        ? (
+          chamber.pupillage_url ||
+          chamber.pupillage_page ||
+          chamber.recruitment_url
+        )
+        : (
+          chamber.mini_pupillage_url ||
+          chamber.mini_pupillage_page ||
+          chamber.recruitment_url
+        )
+    );
+
+  return {
+    typeCode,
+    name,
+
+    type:
+      row.opportunity_type_name ||
+      row.opportunity_type ||
+      row.scheme_type ||
+      defaultType,
+
+    location,
+
+    practiceArea:
+      row.practice_area ||
+      row.practice_area_name,
+
+    openingDate:
+      row.application_open_date ||
+      row.application_open ||
+      row.opens_on ||
+      row.opening_date,
+
+    closingDate:
+      row.application_close_date ||
+      row.application_deadline ||
+      row.deadline ||
+      row.closes_on,
+
+    startDate:
+      row.start_date ||
+      row.programme_start_date ||
+      row.pupillage_start_date,
+
+    programmeDates:
+      row.programme_dates ||
+      row.scheme_dates ||
+      row.actual_programme_dates,
+
+    duration:
+      row.duration ||
+      row.programme_length,
+
+    status:
+      row.application_status ||
+      row.status,
+
+    award:
+      row.pupillage_award ||
+      row.award_amount ||
+      row.funding_amount ||
+      row.salary ||
+      row.payment,
+
+    places:
+      row.number_of_places ||
+      row.number_of_pupillages ||
+      row.places,
+
+    format:
+      row.format ||
+      row.delivery_method,
+
+    applicationRoute:
+      row.application_route ||
+      row.application_method,
+
+    assessed:
+      typeCode === "assessed_mini_pupillage"
+        ? "Yes"
+        : row.assessed,
+
+    eligibility:
+      row.eligibility,
+
+    academicRequirements:
+      row.academic_requirements ||
+      row.academic_requirement,
+
+    applicationProcess:
+      row.application_process ||
+      row.selection_process,
+
+    interviewProcess:
+      row.interview_process ||
+      row.interview_stages,
+
+    writtenAssessment:
+      row.written_assessment ||
+      row.written_exercise,
+
+    advocacyAssessment:
+      row.advocacy_assessment ||
+      row.advocacy_exercise,
+
+    structure:
+      row.pupillage_structure ||
+      row.programme_structure ||
+      row.structure,
+
+    tenancy:
+      row.tenancy_information ||
+      row.tenancy_process,
+
+    expenses:
+      row.travel_expenses ||
+      row.expenses_support ||
+      row.expense_support,
+
+    reasonableAdjustments:
+      row.reasonable_adjustments ||
+      row.adjustments_process,
+
+    additionalDetails:
+      row.additional_details ||
+      row.notes ||
+      row.description,
+
+    applicationUrl
+  };
+}
+
+function sortOpportunitiesByClosingDate(
+  first,
+  second
+) {
+  const firstGroup =
+    closingDateGroup(first.closingDate);
+
+  const secondGroup =
+    closingDateGroup(second.closingDate);
+
+  if (firstGroup !== secondGroup) {
+    return firstGroup - secondGroup;
+  }
+
+  const firstDate =
+    dateValue(first.closingDate);
+
+  const secondDate =
+    dateValue(second.closingDate);
+
+  if (firstGroup === 2) {
+    return secondDate - firstDate;
+  }
+
+  if (firstDate !== secondDate) {
+    return firstDate - secondDate;
+  }
+
+  return first.name.localeCompare(second.name);
+}
+
+function closingDateGroup(value) {
+  if (!value || !isValidDate(value)) {
+    return 1;
+  }
+
+  return startOfDate(value) >= startOfToday()
+    ? 0
+    : 2;
+}
+
+function renderOpportunity(opportunity) {
+  const deadline =
+    formatDate(opportunity.closingDate) ||
+    "Not announced";
+
+  const startDate =
+    formatOpportunityStart(opportunity) ||
+    "Not announced";
+
+  const facts =
+    buildOpportunityFacts(opportunity);
+
+  const detailSections =
+    buildOpportunityDetailSections(
+      opportunity
+    );
 
   return `
-    <article class="profile-card application-card">
-      <h3>${escapeHtml(name)}</h3>
+    <details class="opportunity-item">
+      <summary class="opportunity-summary">
 
-      ${
-        row.practice_area || row.location
-          ? `
-            <p>
-              ${escapeHtml(row.practice_area || "")}
-              ${
-                row.practice_area && row.location
-                  ? " — "
-                  : ""
-              }
-              ${escapeHtml(row.location || "")}
-            </p>
-          `
-          : ""
-      }
+        <div class="opportunity-deadline">
+          <span>Closing</span>
+          <strong>${escapeHtml(deadline)}</strong>
+        </div>
 
-      <div class="profile-fact-grid">
-        ${fact(
-          "Applications open",
-          formatDate(openingDate)
-        )}
+        <div class="opportunity-summary-main">
+          <h3>${escapeHtml(opportunity.name)}</h3>
 
-        ${fact(
-          "Application deadline",
-          formatDate(closingDate)
-        )}
+          <div class="opportunity-summary-meta">
+            <span>
+              <strong>Type:</strong>
+              ${escapeHtml(opportunity.type)}
+            </span>
 
-        ${fact(
-          "Start date",
-          formatDate(startDate)
-        )}
+            <span>
+              <strong>Location:</strong>
+              ${escapeHtml(opportunity.location)}
+            </span>
 
-        ${fact(
-          "Pupillage places",
-          places
-        )}
+            <span>
+              <strong>Starts:</strong>
+              ${escapeHtml(startDate)}
+            </span>
+          </div>
+        </div>
 
-        ${fact(
-          "Award",
-          formatMoneyOrText(award)
-        )}
+        <span
+          class="opportunity-chevron"
+          aria-hidden="true"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
+        </span>
 
-        ${fact(
-          "Duration",
-          row.duration
-        )}
+      </summary>
 
-        ${fact(
-          "Application route",
-          row.application_route ||
-          row.application_method
-        )}
+      <div class="opportunity-expanded">
 
-        ${fact(
-          "Status",
-          row.application_status ||
-          row.status
-        )}
+        ${
+          facts
+            ? `
+              <div class="opportunity-facts">
+                ${facts}
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          detailSections.length
+            ? `
+              <div class="opportunity-detail-sections">
+                ${detailSections.join("")}
+              </div>
+            `
+            : `
+              <p class="opportunity-no-details">
+                Further details have not yet been added.
+              </p>
+            `
+        }
+
+        ${
+          opportunity.applicationUrl
+            ? `
+              <div class="opportunity-link-panel">
+                ${profileLink(
+                  opportunity.applicationUrl,
+                  "View official opportunity page"
+                )}
+              </div>
+            `
+            : ""
+        }
+
       </div>
-
-      ${
-        row.eligibility
-          ? `
-            <p class="profile-eligibility">
-              <strong>Eligibility:</strong>
-              ${escapeHtml(row.eligibility)}
-            </p>
-          `
-          : ""
-      }
-
-      ${
-        row.application_process ||
-        row.selection_process
-          ? `
-            <p class="profile-eligibility">
-              <strong>Selection process:</strong>
-              ${escapeHtml(
-                row.application_process ||
-                row.selection_process
-              )}
-            </p>
-          `
-          : ""
-      }
-
-      ${
-        applicationUrl
-          ? profileLink(
-              applicationUrl,
-              "Official application information"
-            )
-          : ""
-      }
-    </article>
+    </details>
   `;
 }
 
-async function loadMiniPupillages(
+function buildOpportunityFacts(opportunity) {
+  const facts = [
+    fact(
+      "Applications open",
+      formatDate(opportunity.openingDate)
+    ),
+
+    fact(
+      "Closing date",
+      formatDate(opportunity.closingDate)
+    ),
+
+    fact(
+      "Start date",
+      formatDate(opportunity.startDate)
+    ),
+
+    fact(
+      "Programme dates",
+      formatDisplayValue(
+        opportunity.programmeDates
+      )
+    ),
+
+    fact(
+      "Duration",
+      opportunity.duration
+    ),
+
+    fact(
+      "Location",
+      opportunity.location
+    ),
+
+    fact(
+      "Practice area",
+      opportunity.practiceArea
+    ),
+
+    fact(
+      "Places",
+      opportunity.places
+    ),
+
+    fact(
+      "Pupillage award or payment",
+      formatMoneyOrText(
+        opportunity.award
+      )
+    ),
+
+    fact(
+      "Format",
+      opportunity.format
+    ),
+
+    fact(
+      "Assessed",
+      formatDisplayValue(
+        opportunity.assessed
+      )
+    ),
+
+    fact(
+      "Application route",
+      opportunity.applicationRoute
+    ),
+
+    fact(
+      "Status",
+      opportunity.status
+    )
+  ].filter(Boolean);
+
+  return facts.join("");
+}
+
+function buildOpportunityDetailSections(
+  opportunity
+) {
+  const sections = [];
+
+  addBulletSection(
+    sections,
+    "Eligibility",
+    opportunity.eligibility
+  );
+
+  addBulletSection(
+    sections,
+    "Academic requirements",
+    opportunity.academicRequirements
+  );
+
+  addBulletSection(
+    sections,
+    "Application process",
+    opportunity.applicationProcess
+  );
+
+  addBulletSection(
+    sections,
+    "Interview process",
+    opportunity.interviewProcess
+  );
+
+  addBulletSection(
+    sections,
+    "Written assessment",
+    opportunity.writtenAssessment
+  );
+
+  addBulletSection(
+    sections,
+    "Advocacy assessment",
+    opportunity.advocacyAssessment
+  );
+
+  addBulletSection(
+    sections,
+    "Programme structure",
+    opportunity.structure
+  );
+
+  addBulletSection(
+    sections,
+    "Tenancy information",
+    opportunity.tenancy
+  );
+
+  addBulletSection(
+    sections,
+    "Travel and expenses",
+    opportunity.expenses
+  );
+
+  addBulletSection(
+    sections,
+    "Reasonable adjustments",
+    opportunity.reasonableAdjustments
+  );
+
+  addBulletSection(
+    sections,
+    "Further information",
+    opportunity.additionalDetails
+  );
+
+  return sections;
+}
+
+function addBulletSection(
+  sections,
+  heading,
+  value
+) {
+  const points = splitIntoBulletPoints(value);
+
+  if (!points.length) {
+    return;
+  }
+
+  sections.push(`
+    <section class="opportunity-detail-section">
+      <h4>${escapeHtml(heading)}</h4>
+
+      <ul class="opportunity-bullets">
+        ${points
+          .map(point => `
+            <li>${escapeHtml(point)}</li>
+          `)
+          .join("")}
+      </ul>
+    </section>
+  `);
+}
+
+function splitIntoBulletPoints(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return uniqueCleanPoints(
+      value.flatMap(splitIntoBulletPoints)
+    );
+  }
+
+  if (typeof value === "object") {
+    return uniqueCleanPoints(
+      Object.values(value)
+        .flatMap(splitIntoBulletPoints)
+    );
+  }
+
+  const text = String(value)
+    .replace(/\r/g, "\n")
+    .replace(/[•●▪◦]/g, "\n")
+    .replace(/\s+-\s+/g, "\n")
+    .replace(/;\s+/g, "\n")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+
+  let points = text
+    .split("\n")
+    .map(cleanBulletPoint)
+    .filter(Boolean);
+
+  if (points.length === 1) {
+    points = points[0]
+      .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
+      .map(cleanBulletPoint)
+      .filter(Boolean);
+  }
+
+  return uniqueCleanPoints(points);
+}
+
+function cleanBulletPoint(value) {
+  return String(value || "")
+    .replace(/^[\s\-–—:;,.]+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function uniqueCleanPoints(points) {
+  return [
+    ...new Set(
+      points
+        .map(cleanBulletPoint)
+        .filter(Boolean)
+    )
+  ];
+}
+
+function formatOpportunityStart(opportunity) {
+  if (opportunity.startDate) {
+    return formatDate(
+      opportunity.startDate
+    );
+  }
+
+  if (opportunity.programmeDates) {
+    return formatDisplayValue(
+      opportunity.programmeDates
+    );
+  }
+
+  return "";
+}
+
+/* =======================================
+   Funding
+======================================= */
+
+async function loadFunding(
   chamber,
   opportunities
 ) {
-  const container =
-    document.getElementById("miniPupillageList");
-
-  if (!container) {
-    return;
-  }
-
-  const miniPupillages = opportunities.filter(row => {
-    const type = getOpportunityType(row);
-
-    return (
-      type === "mini_pupillage" ||
-      type === "assessed_mini_pupillage"
-    );
-  });
-
-  if (!miniPupillages.length) {
-    const url =
-      chamber.mini_pupillage_url ||
-      chamber.mini_pupillage_page;
-
-    container.innerHTML = url
-      ? `
-        ${emptyMessage(
-          "No structured mini-pupillage record has been added yet."
-        )}
-        ${profileLink(
-          url,
-          "Visit the official mini-pupillage page"
-        )}
-      `
-      : emptyMessage(
-          "No mini-pupillage record has been added yet."
-        );
-
-    return;
-  }
-
-  container.innerHTML = miniPupillages
-    .map(renderMiniPupillageCard)
-    .join("");
-}
-
-function renderMiniPupillageCard(row) {
-  const type = getOpportunityType(row);
-
-  const name =
-    row.scheme_name ||
-    row.opportunity_name ||
-    row.programme_name ||
-    (
-      type === "assessed_mini_pupillage"
-        ? "Assessed mini-pupillage"
-        : "Mini-pupillage"
-    );
-
-  const openingDate =
-    row.application_open_date ||
-    row.application_open ||
-    row.opens_on;
-
-  const closingDate =
-    row.application_close_date ||
-    row.application_deadline ||
-    row.deadline ||
-    row.closes_on;
-
-  const programmeDates =
-    row.programme_dates ||
-    row.scheme_dates ||
-    row.actual_programme_dates;
-
-  const applicationUrl =
-    row.application_url ||
-    row.application_link ||
-    row.official_url ||
-    row.source_url;
-
-  return `
-    <article class="profile-card application-card">
-      <h3>${escapeHtml(name)}</h3>
-
-      <div class="profile-fact-grid">
-        ${fact(
-          "Type",
-          type === "assessed_mini_pupillage"
-            ? "Assessed"
-            : "Unassessed or not stated"
-        )}
-
-        ${fact(
-          "Applications open",
-          formatDate(openingDate)
-        )}
-
-        ${fact(
-          "Application deadline",
-          formatDate(closingDate)
-        )}
-
-        ${fact(
-          "Programme dates",
-          formatDisplayValue(programmeDates)
-        )}
-
-        ${fact(
-          "Duration",
-          row.duration ||
-          row.programme_length
-        )}
-
-        ${fact(
-          "Location",
-          row.location ||
-          row.location_text
-        )}
-
-        ${fact(
-          "Format",
-          row.format ||
-          row.delivery_method
-        )}
-
-        ${fact(
-          "Payment",
-          row.payment ||
-          row.salary
-        )}
-      </div>
-
-      ${
-        row.eligibility
-          ? `
-            <p class="profile-eligibility">
-              <strong>Eligibility:</strong>
-              ${escapeHtml(row.eligibility)}
-            </p>
-          `
-          : ""
-      }
-
-      ${
-        applicationUrl
-          ? profileLink(
-              applicationUrl,
-              "Official application information"
-            )
-          : ""
-      }
-    </article>
-  `;
-}
-
-async function loadFunding(chamber, opportunities) {
   const container =
     document.getElementById("fundingList");
 
@@ -941,35 +1314,51 @@ async function loadFunding(chamber, opportunities) {
 
   const fundingCards = [];
 
-  const chamberFunding = collectPresentFields(
-    chamber,
-    [
-      ["Pupillage award", [
-        "pupillage_award",
-        "award_amount",
-        "pupillage_funding"
-      ]],
-      ["Drawdown", [
-        "drawdown",
-        "drawdown_available",
-        "award_drawdown"
-      ]],
-      ["Guaranteed earnings", [
-        "guaranteed_earnings",
-        "receipts_guarantee",
-        "minimum_receipts"
-      ]],
-      ["Travel or expenses", [
-        "travel_expenses",
-        "expenses_support",
-        "expense_support"
-      ]],
-      ["Bar course support", [
-        "bar_course_funding",
-        "bar_course_support"
-      ]]
-    ]
-  );
+  const chamberFunding =
+    collectPresentFields(
+      chamber,
+      [
+        [
+          "Pupillage award",
+          [
+            "pupillage_award",
+            "award_amount",
+            "pupillage_funding"
+          ]
+        ],
+        [
+          "Drawdown",
+          [
+            "drawdown",
+            "drawdown_available",
+            "award_drawdown"
+          ]
+        ],
+        [
+          "Guaranteed earnings",
+          [
+            "guaranteed_earnings",
+            "receipts_guarantee",
+            "minimum_receipts"
+          ]
+        ],
+        [
+          "Travel or expenses",
+          [
+            "travel_expenses",
+            "expenses_support",
+            "expense_support"
+          ]
+        ],
+        [
+          "Bar course support",
+          [
+            "bar_course_funding",
+            "bar_course_support"
+          ]
+        ]
+      ]
+    );
 
   if (chamberFunding.length) {
     fundingCards.push(`
@@ -991,7 +1380,9 @@ async function loadFunding(chamber, opportunities) {
   }
 
   opportunities
-    .filter(row => getOpportunityType(row) === "pupillage")
+    .filter(row =>
+      getOpportunityType(row) === "pupillage"
+    )
     .forEach(row => {
       const award =
         row.pupillage_award ||
@@ -1074,6 +1465,10 @@ async function loadFunding(chamber, opportunities) {
       );
 }
 
+/* =======================================
+   EDI and accessibility
+======================================= */
+
 async function loadAccessibility(chamber) {
   const container =
     document.getElementById("accessibilityList");
@@ -1084,45 +1479,75 @@ async function loadAccessibility(chamber) {
 
   const sections = [
     {
-      title: "Equality, diversity and inclusion",
-      value: firstPresentValue(chamber, [
-        "edi_information",
-        "equality_diversity_inclusion",
-        "diversity_information",
-        "edi_policy"
-      ])
+      title:
+        "Equality, diversity and inclusion",
+
+      value:
+        firstPresentValue(
+          chamber,
+          [
+            "edi_information",
+            "equality_diversity_inclusion",
+            "diversity_information",
+            "edi_policy"
+          ]
+        )
     },
     {
-      title: "Reasonable adjustments",
-      value: firstPresentValue(chamber, [
-        "reasonable_adjustments",
-        "adjustments_process",
-        "candidate_adjustments"
-      ])
+      title:
+        "Reasonable adjustments",
+
+      value:
+        firstPresentValue(
+          chamber,
+          [
+            "reasonable_adjustments",
+            "adjustments_process",
+            "candidate_adjustments"
+          ]
+        )
     },
     {
-      title: "Premises accessibility",
-      value: firstPresentValue(chamber, [
-        "premises_accessibility",
-        "accessibility_information",
-        "building_accessibility"
-      ])
+      title:
+        "Premises accessibility",
+
+      value:
+        firstPresentValue(
+          chamber,
+          [
+            "premises_accessibility",
+            "accessibility_information",
+            "building_accessibility"
+          ]
+        )
     },
     {
-      title: "Social mobility and outreach",
-      value: firstPresentValue(chamber, [
-        "social_mobility",
-        "outreach_information",
-        "access_programmes"
-      ])
+      title:
+        "Social mobility and outreach",
+
+      value:
+        firstPresentValue(
+          chamber,
+          [
+            "social_mobility",
+            "outreach_information",
+            "access_programmes"
+          ]
+        )
     },
     {
-      title: "Adjustments contact",
-      value: firstPresentValue(chamber, [
-        "adjustments_contact",
-        "accessibility_contact",
-        "recruitment_contact"
-      ])
+      title:
+        "Adjustments contact",
+
+      value:
+        firstPresentValue(
+          chamber,
+          [
+            "adjustments_contact",
+            "accessibility_contact",
+            "recruitment_contact"
+          ]
+        )
     }
   ].filter(section => section.value);
 
@@ -1130,18 +1555,49 @@ async function loadAccessibility(chamber) {
     container.innerHTML = emptyMessage(
       "No detailed EDI or accessibility information has been added yet."
     );
+
     return;
   }
 
   container.innerHTML = sections
-    .map(section => `
-      <article class="profile-card">
-        <h3>${escapeHtml(section.title)}</h3>
-        <p>${escapeHtml(formatDisplayValue(section.value))}</p>
-      </article>
-    `)
+    .map(section => {
+      const points =
+        splitIntoBulletPoints(section.value);
+
+      return `
+        <article class="profile-card">
+          <h3>${escapeHtml(section.title)}</h3>
+
+          ${
+            points.length > 1
+              ? `
+                <ul class="opportunity-bullets">
+                  ${points
+                    .map(point => `
+                      <li>${escapeHtml(point)}</li>
+                    `)
+                    .join("")}
+                </ul>
+              `
+              : `
+                <p>
+                  ${escapeHtml(
+                    formatDisplayValue(
+                      section.value
+                    )
+                  )}
+                </p>
+              `
+          }
+        </article>
+      `;
+    })
     .join("");
 }
+
+/* =======================================
+   Opportunity type
+======================================= */
 
 function getOpportunityType(row) {
   const rawType = normaliseText(
@@ -1172,6 +1628,10 @@ function getOpportunityType(row) {
   return "";
 }
 
+/* =======================================
+   Database helpers
+======================================= */
+
 async function readRowsUsingPossibleKeys(
   tableName,
   keyPairs
@@ -1198,6 +1658,7 @@ async function readRowsUsingPossibleKeys(
           `Unable to query ${tableName}.${columnName}:`,
           error.message
         );
+
         continue;
       }
 
@@ -1221,11 +1682,17 @@ async function readRowsUsingPossibleKeys(
   );
 }
 
-function collectPresentFields(record, definitions) {
+function collectPresentFields(
+  record,
+  definitions
+) {
   return definitions
     .map(([label, keys]) => ({
       label,
-      value: firstPresentValue(record, keys)
+      value: firstPresentValue(
+        record,
+        keys
+      )
     }))
     .filter(item =>
       item.value !== null &&
@@ -1273,7 +1740,10 @@ function parseListValue(value) {
     .filter(Boolean);
 }
 
-function deduplicateObjects(rows, keyFunction) {
+function deduplicateObjects(
+  rows,
+  keyFunction
+) {
   const map = new Map();
 
   rows.forEach(row => {
@@ -1291,6 +1761,10 @@ function deduplicateObjects(rows, keyFunction) {
   return [...map.values()];
 }
 
+/* =======================================
+   Shared display helpers
+======================================= */
+
 function fact(label, value) {
   if (
     value === null ||
@@ -1307,7 +1781,9 @@ function fact(label, value) {
       </span>
 
       <span class="fact-value">
-        ${escapeHtml(formatDisplayValue(value))}
+        ${escapeHtml(
+          formatDisplayValue(value)
+        )}
       </span>
     </div>
   `;
@@ -1359,7 +1835,8 @@ function emptyMessage(message) {
 }
 
 function setText(id, value) {
-  const element = document.getElementById(id);
+  const element =
+    document.getElementById(id);
 
   if (element) {
     element.textContent = value;
@@ -1436,6 +1913,41 @@ function formatDisplayValue(value) {
   return String(value);
 }
 
+function dateValue(value) {
+  if (!value) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  const timestamp =
+    new Date(value).getTime();
+
+  return Number.isNaN(timestamp)
+    ? Number.POSITIVE_INFINITY
+    : timestamp;
+}
+
+function isValidDate(value) {
+  return !Number.isNaN(
+    new Date(value).getTime()
+  );
+}
+
+function startOfToday() {
+  const date = new Date();
+
+  date.setHours(0, 0, 0, 0);
+
+  return date.getTime();
+}
+
+function startOfDate(value) {
+  const date = new Date(value);
+
+  date.setHours(0, 0, 0, 0);
+
+  return date.getTime();
+}
+
 function normaliseText(value) {
   return String(value || "")
     .trim()
@@ -1450,6 +1962,10 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+/* =======================================
+   Icons
+======================================= */
 
 function locationIcon() {
   return `
