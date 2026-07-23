@@ -857,10 +857,7 @@ function renderOpportunity(
     );
 
   return `
-    <details
-      class="opportunity-item"
-      ${index === 0 ? "open" : ""}
-    >
+    <details class="opportunity-item">
       <summary class="opportunity-summary">
 
         <div class="opportunity-deadline">
