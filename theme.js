@@ -1,23 +1,56 @@
 // =======================================
 // Vacatory
-// theme.js — light/dark mode toggle
-// (the initial theme is set by an inline script in <head> to avoid a flash;
-// this file only wires up the button once the DOM is ready)
+// theme.js — theme and mobile navigation
 // =======================================
 
 document.addEventListener("DOMContentLoaded", () => {
+  const themeButton = document.getElementById("themeToggle");
 
-    const btn = document.getElementById("themeToggle");
-    if (!btn) return;
+  if (themeButton) {
+    themeButton.addEventListener("click", () => {
+      const isDark =
+        document.documentElement.dataset.theme === "dark";
 
-    btn.addEventListener("click", () => {
+      const nextTheme = isDark ? "light" : "dark";
 
-        const isDark = document.documentElement.dataset.theme === "dark";
-        const next = isDark ? "light" : "dark";
+      document.documentElement.dataset.theme = nextTheme;
+      localStorage.setItem("vacatory-theme", nextTheme);
+    });
+  }
 
-        document.documentElement.dataset.theme = next;
-        localStorage.setItem("vacatory-theme", next);
+  const menuButton = document.getElementById("mobileMenuToggle");
+  const mobileNavigation =
+    document.getElementById("mobileNavigation");
 
+  if (menuButton && mobileNavigation) {
+    menuButton.addEventListener("click", () => {
+      const isOpen =
+        menuButton.getAttribute("aria-expanded") === "true";
+
+      menuButton.setAttribute(
+        "aria-expanded",
+        String(!isOpen)
+      );
+
+      menuButton.setAttribute(
+        "aria-label",
+        isOpen
+          ? "Open navigation menu"
+          : "Close navigation menu"
+      );
+
+      mobileNavigation.hidden = isOpen;
     });
 
+    mobileNavigation.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        mobileNavigation.hidden = true;
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.setAttribute(
+          "aria-label",
+          "Open navigation menu"
+        );
+      });
+    });
+  }
 });
