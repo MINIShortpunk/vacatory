@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <script>
+    (function () {
+      var savedTheme = localStorage.getItem("vacatory-theme");
+
+      var preferredTheme = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches
+        ? "dark"
+        : "light";
+
+      document.documentElement.dataset.theme =
+        savedTheme || preferredTheme;
+    })();
+  </script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff">
+
+  <title>Firm profile — Vacatory</title>
+
+  <meta
+    name="description"
+    content="Research law firm practice areas, locations, roles, vacation schemes and training contracts on Vacatory."
+  >
+
+  <link rel="stylesheet" href="styles.css?v=16">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+
+<body>
+  <a class="skip-link" href="#main-content">
+    Skip to content
+  </a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+
+      <a href="index.html" class="brand" aria-label="Vacatory home">
+        <svg
+          class="brand-mark"
+          viewBox="0 0 28 28"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 4 L14 24"
+            class="logo-stroke-left"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+
+          <path
+            d="M24 4 L14 24"
+            class="logo-stroke-right"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+        </svg>
+
+        <span class="brand-word">acatory</span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a
+          href="firms.html"
+          class="active"
+          aria-current="page"
+        >
+          Firms
+        </a>
+
+        <a href="chambers.html">
+          Chambers
+        </a>
+
+        <a href="deadlines.html">
+          Deadlines
+        </a>
+
+        <a href="commercial-awareness.html">
+          Commercial Awareness
+        </a>
+      </nav>
+
+      <div class="header-actions">
+
+        <button
+          id="mobileMenuToggle"
+          class="mobile-menu-toggle"
+          type="button"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+          aria-controls="mobileNavigation"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16"></path>
+            <path d="M4 12h16"></path>
+            <path d="M4 17h16"></path>
+          </svg>
+        </button>
+
+        <a
+          class="header-search-link"
+          href="firms.html"
+          aria-label="Search firms"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+          </svg>
+        </a>
+
+        <button
+          id="themeToggle"
+          class="theme-toggle"
+          aria-label="Toggle dark mode"
+          type="button"
+        >
+          <svg
+            class="icon-sun"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>
+
+          <svg
+            class="icon-moon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <nav
+    id="mobileNavigation"
+    class="mobile-navigation"
+    aria-label="Mobile navigation"
+    hidden
+  >
+    <a href="firms.html" aria-current="page">
+      Firms
+    </a>
+
+    <a href="chambers.html">
+      Chambers
+    </a>
+
+    <a href="deadlines.html">
+      Deadlines
+    </a>
+
+    <a href="commercial-awareness.html">
+      Commercial Awareness
+    </a>
+  </nav>
+
+  <div class="site-notice" role="status">
+    <div class="container notice-inner">
+      <span class="notice-dot" aria-hidden="true"></span>
+
+      <strong>Site update in progress.</strong>
+
+      <span>
+        Some information may change.
+      </span>
+    </div>
+  </div>
+
+  <main id="main-content">
+
+    <div
+      id="loadingState"
+      class="container profile-loading"
+      role="status"
+    >
+      <p class="loading">
+        Loading firm…
+      </p>
+    </div>
+
+    <div
+      id="errorState"
+      class="container profile-loading hidden"
+      role="alert"
+    >
+      <p class="loading">
+        Firm not found.
+        <a href="firms.html">Back to firms</a>
+      </p>
+    </div>
+
+    <div id="profileContent" class="hidden">
+
+      <section class="profile-hero">
+        <div class="container profile-hero-inner">
+
+          <a href="firms.html" class="back-link">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path d="M19 12H5"></path>
+              <path d="M11 18l-6-6 6-6"></path>
+            </svg>
+
+            Back to firms
+          </a>
+
+          <div class="profile-header-row">
+
+            <div
+              id="firmLogo"
+              class="firm-logo profile-logo"
+              aria-hidden="true"
+            ></div>
+
+            <div class="profile-header-text">
+              <p id="firmType" class="firm-type"></p>
+              <h1 id="firmName"></h1>
+            </div>
+
+          </div>
+
+          <p
+            id="firmOverview"
+            class="profile-overview"
+          ></p>
+
+          <div
+            id="firmMeta"
+            class="profile-meta-row"
+            aria-label="Firm key details"
+          ></div>
+
+        </div>
+      </section>
+
+      <nav
+        class="profile-tabs"
+        id="profileTabs"
+        aria-label="Firm profile sections"
+      >
+        <div class="container profile-tabs-inner">
+
+          <button
+            class="tab-btn active"
+            type="button"
+            data-tab="overview"
+          >
+            Overview
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="practice-areas"
+          >
+            Practice areas
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="roles"
+          >
+            Roles
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="locations"
+          >
+            Locations
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="vacation-schemes"
+          >
+            Vacation schemes
+          </button>
+
+          <button
+            class="tab-btn"
+            type="button"
+            data-tab="training-contract"
+          >
+            Training contract
+          </button>
+
+        </div>
+      </nav>
+
+      <div class="container profile-body">
+
+        <section
+          class="tab-panel active"
+          id="tab-overview"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              At a glance
+            </p>
+
+            <h2>
+              Overview
+            </h2>
+
+            <p class="tab-intro">
+              Key information to help you understand the firm before
+              beginning your application research.
+            </p>
+          </div>
+
+          <div class="profile-grid">
+
+            <article class="profile-card">
+              <h3>Firm size</h3>
+              <p id="ov-size">—</p>
+            </article>
+
+            <article class="profile-card">
+              <h3>Secondments</h3>
+              <p id="ov-secondments">—</p>
+            </article>
+
+            <article class="profile-card">
+              <h3>Scholarships</h3>
+              <p id="ov-scholarships">—</p>
+            </article>
+
+          </div>
+
+          <div
+            id="ov-links"
+            class="profile-links"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-practice-areas"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Work areas
+            </p>
+
+            <h2>
+              Practice areas
+            </h2>
+
+            <p class="tab-intro">
+              The legal services and practice areas listed for this firm.
+            </p>
+          </div>
+
+          <div
+            id="practiceAreasList"
+            class="profile-list"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-roles"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Career paths
+            </p>
+
+            <h2>
+              Roles
+            </h2>
+
+            <p class="tab-intro">
+              Career routes and role families connected to the firm.
+            </p>
+          </div>
+
+          <div
+            id="rolesList"
+            class="profile-list roles-list"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-locations"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Offices
+            </p>
+
+            <h2>
+              Locations
+            </h2>
+
+            <p class="tab-intro">
+              Office locations and the opportunities available in each
+              location where confirmed.
+            </p>
+          </div>
+
+          <div
+            id="locationsList"
+            class="profile-list"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-vacation-schemes"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Applications
+            </p>
+
+            <h2>
+              Vacation schemes
+            </h2>
+
+            <p class="tab-intro">
+              Scheme dates, eligibility, application deadlines and
+              official application information.
+            </p>
+          </div>
+
+          <div
+            id="vacationSchemesList"
+            class="profile-list"
+          ></div>
+        </section>
+
+        <section
+          class="tab-panel"
+          id="tab-training-contract"
+        >
+          <div class="tab-heading">
+            <p class="eyebrow">
+              Graduate route
+            </p>
+
+            <h2>
+              Training contract
+            </h2>
+
+            <p class="tab-intro">
+              Training contract details, locations, application dates,
+              salaries and qualification information.
+            </p>
+          </div>
+
+          <div
+            id="trainingContractList"
+            class="profile-list"
+          ></div>
+        </section>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+
+      <a
+        href="index.html"
+        class="brand small"
+        aria-label="Vacatory home"
+      >
+        <svg
+          class="brand-mark"
+          viewBox="0 0 28 28"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 4 L14 24"
+            class="logo-stroke-left"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+
+          <path
+            d="M24 4 L14 24"
+            class="logo-stroke-right"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+        </svg>
+
+        <span class="brand-word">acatory</span>
+      </a>
+
+      <p class="footer-statement">
+        © 2026 Vacatory
+      </p>
+
+      <div class="footer-links">
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script defer src="supabase.js"></script>
+  <script defer src="firm-profile.js?v=1"></script>
+  <script defer src="theme.js?v=2"></script>
+</body>
+</html>
