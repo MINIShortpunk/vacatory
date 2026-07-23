@@ -1,415 +1,829 @@
 // =======================================
 // Vacatory
-// firm.js — firm profile page
+// firms.js — UK law firms directory
 // =======================================
 
-const params = new URLSearchParams(window.location.search);
-const firmId = params.get("id");
-const favouritesKey = "vacatory-favourites";
+const directoryState = {
+  firms: [],
+  filteredFirms: [],
+  firmById: new Map(),
+  firmByOrganisationId: new Map(),
+  firmByName: new Map()
+};
 
-document.addEventListener("DOMContentLoaded", () => {
-  setupTabs();
+const directoryElements = {};
 
-  if (!firmId) {
-    showError();
+document.addEventListener("DOMContentLoaded", initialiseFirmsDirectory);
+
+async function initialiseFirmsDirectory() {
+  cacheDirectoryElements();
+  connectDirectoryFilters();
+
+  if (typeof client === "undefined") {
+    console.error("Supabase client is unavailable.");
+    showDirectoryError();
     return;
   }
 
-  loadFirm();
-});
+  try {
+    const { data: firms, error } = await client
+      .from("firms")
+      .select("*");
 
-function showError() {
-  document.getElementById("loadingState")?.classList.add("hidden");
-  document.getElementById("errorState")?.classList.remove("hidden");
+    if (error) {
+      throw error;
+    }
+
+    directoryState.firms = (firms || [])
+      .filter(firm => firm && firm.id && firm.name)
+      .map(normaliseFirm);
+
+    buildFirmMaps();
+
+    await loadSupportingFirmData();
+
+    populateFilterOptions();
+    applyDirectoryFilters();
+
+    directoryElements.loading?.classList.add("hidden");
+  } catch (error) {
+    console.error("Unable to load firms:", error);
+    showDirectoryError();
+  }
 }
 
-async function loadFirm() {
-  const { data: firm, error } = await client
-    .from("firms")
-    .select("*")
-    .eq("id", firmId)
-    .single();
+function cacheDirectoryElements() {
+  directoryElements.search =
+    document.getElementById("directorySearch");
 
-  if (error || !firm) {
-    console.error(error);
-    showError();
+  directoryElements.sort =
+    document.getElementById("sortFilter");
+
+  directoryElements.location =
+    document.getElementById("locationFilter");
+
+  directoryElements.practice =
+    document.getElementById("practiceFilter");
+
+  directoryElements.role =
+    document.getElementById("roleFilter");
+
+  directoryElements.status =
+    document.getElementById("statusFilter");
+
+  directoryElements.clear =
+    document.getElementById("clearFilters");
+
+  directoryElements.count =
+    document.getElementById("directoryCount");
+
+  directoryElements.loading =
+    document.getElementById("directoryLoading");
+
+  directoryElements.error =
+    document.getElementById("directoryError");
+
+  directoryElements.empty =
+    document.getElementById("directoryEmpty");
+
+  directoryElements.list =
+    document.getElementById("firmsDirectory");
+}
+
+function connectDirectoryFilters() {
+  directoryElements.search?.addEventListener(
+    "input",
+    applyDirectoryFilters
+  );
+
+  directoryElements.sort?.addEventListener(
+    "change",
+    applyDirectoryFilters
+  );
+
+  directoryElements.location?.addEventListener(
+    "change",
+    applyDirectoryFilters
+  );
+
+  directoryElements.practice?.addEventListener(
+    "change",
+    applyDirectoryFilters
+  );
+
+  directoryElements.role?.addEventListener(
+    "change",
+    applyDirectoryFilters
+  );
+
+  directoryElements.status?.addEventListener(
+    "change",
+    applyDirectoryFilters
+  );
+
+  directoryElements.clear?.addEventListener(
+    "click",
+    clearDirectoryFilters
+  );
+}
+
+function normaliseFirm(firm) {
+  return {
+    ...firm,
+    locations: [],
+    practiceAreas: [],
+    roles: [],
+    statuses: []
+  };
+}
+
+function buildFirmMaps() {
+  directoryState.firmById.clear();
+  directoryState.firmByOrganisationId.clear();
+  directoryState.firmByName.clear();
+
+  directoryState.firms.forEach(firm => {
+    directoryState.firmById.set(
+      String(firm.id),
+      firm
+    );
+
+    if (firm.organisation_id) {
+      directoryState.firmByOrganisationId.set(
+        String(firm.organisation_id),
+        firm
+      );
+    }
+
+    directoryState.firmByName.set(
+      normaliseText(firm.name),
+      firm
+    );
+
+    if (firm.short_name) {
+      directoryState.firmByName.set(
+        normaliseText(firm.short_name),
+        firm
+      );
+    }
+  });
+}
+
+async function loadSupportingFirmData() {
+  const [
+    organisationLocations,
+    legacyLocations,
+    practiceAreas,
+    firmRoles,
+    vacationSchemes,
+    trainingContracts,
+    publicDeadlines
+  ] = await Promise.all([
+    readOptionalTable("organisation_locations"),
+    readOptionalTable("locations"),
+    readOptionalTable("practice_areas"),
+    readOptionalTable("firm_roles"),
+    readOptionalTable("vacation_schemes"),
+    readOptionalTable("training_contracts"),
+    readOptionalTable("deadlines_public_view")
+  ]);
+
+  addLocationRows([
+    ...organisationLocations,
+    ...legacyLocations
+  ]);
+
+  addPracticeAreaRows(practiceAreas);
+  addRoleRows(firmRoles);
+  addVacationSchemeRows(vacationSchemes);
+  addTrainingContractRows(trainingContracts);
+  addDeadlineRows(publicDeadlines);
+
+  directoryState.firms.forEach(firm => {
+    firm.locations = uniqueSorted(firm.locations);
+    firm.practiceAreas = uniqueSorted(firm.practiceAreas);
+    firm.roles = uniqueSorted(firm.roles);
+    firm.statuses = [...new Set(firm.statuses)];
+  });
+}
+
+async function readOptionalTable(tableName) {
+  const { data, error } = await client
+    .from(tableName)
+    .select("*");
+
+  if (error) {
+    console.warn(
+      `Optional directory source unavailable: ${tableName}`,
+      error.message
+    );
+
+    return [];
+  }
+
+  return data || [];
+}
+
+function findFirmForRow(row) {
+  const directIds = [
+    row.firm_id,
+    row.provider_firm_id
+  ].filter(Boolean);
+
+  for (const id of directIds) {
+    const firm = directoryState.firmById.get(String(id));
+
+    if (firm) {
+      return firm;
+    }
+  }
+
+  const organisationIds = [
+    row.organisation_id,
+    row.legal_organisation_id,
+    row.provider_id
+  ].filter(Boolean);
+
+  for (const id of organisationIds) {
+    const firm =
+      directoryState.firmByOrganisationId.get(String(id));
+
+    if (firm) {
+      return firm;
+    }
+  }
+
+  const possibleNames = [
+    row.firm_name,
+    row.provider_name,
+    row.organisation_name,
+    row.legal_organisation_name
+  ].filter(Boolean);
+
+  for (const name of possibleNames) {
+    const firm = directoryState.firmByName.get(
+      normaliseText(name)
+    );
+
+    if (firm) {
+      return firm;
+    }
+  }
+
+  return null;
+}
+
+function addLocationRows(rows) {
+  rows.forEach(row => {
+    const firm = findFirmForRow(row);
+
+    if (!firm) {
+      return;
+    }
+
+    const city =
+      row.city ||
+      row.location_name ||
+      row.office_name ||
+      row.name;
+
+    const country = row.country;
+
+    if (!city) {
+      return;
+    }
+
+    const label = country
+      ? `${city}, ${country}`
+      : city;
+
+    firm.locations.push(label);
+  });
+}
+
+function addPracticeAreaRows(rows) {
+  rows.forEach(row => {
+    const firm = findFirmForRow(row);
+
+    if (!firm) {
+      return;
+    }
+
+    const practiceArea =
+      row.practice_area ||
+      row.practice_name ||
+      row.service_name ||
+      row.name;
+
+    if (practiceArea) {
+      firm.practiceAreas.push(practiceArea);
+    }
+  });
+}
+
+function addRoleRows(rows) {
+  rows.forEach(row => {
+    const firm = findFirmForRow(row);
+
+    if (!firm) {
+      return;
+    }
+
+    const role =
+      row.role_name ||
+      row.official_role_title ||
+      row.role_title ||
+      row.name;
+
+    if (role) {
+      firm.roles.push(role);
+    }
+  });
+}
+
+function addVacationSchemeRows(rows) {
+  rows.forEach(row => {
+    const firm = findFirmForRow(row);
+
+    if (!firm) {
+      return;
+    }
+
+    firm.roles.push(
+      row.scheme_name || "Vacation scheme"
+    );
+
+    addStatusToFirm(
+      firm,
+      row.application_status || row.status
+    );
+  });
+}
+
+function addTrainingContractRows(rows) {
+  rows.forEach(row => {
+    const firm = findFirmForRow(row);
+
+    if (!firm) {
+      return;
+    }
+
+    firm.roles.push(
+      row.programme_name || "Training contract"
+    );
+
+    addStatusToFirm(
+      firm,
+      row.application_status || row.status
+    );
+  });
+}
+
+function addDeadlineRows(rows) {
+  rows.forEach(row => {
+    const pathway = normaliseText(
+      row.career_pathway || ""
+    );
+
+    if (pathway && pathway !== "solicitor") {
+      return;
+    }
+
+    const firm = findFirmForRow(row);
+
+    if (!firm) {
+      return;
+    }
+
+    const opportunity =
+      row.opportunity_type_name ||
+      row.opportunity_type ||
+      row.opportunity_name ||
+      row.programme_name;
+
+    if (opportunity) {
+      firm.roles.push(opportunity);
+    }
+
+    addStatusToFirm(
+      firm,
+      row.application_status ||
+      row.status ||
+      row.cycle_status
+    );
+  });
+}
+
+function addStatusToFirm(firm, value) {
+  const status = normaliseApplicationStatus(value);
+
+  if (status) {
+    firm.statuses.push(status);
+  }
+}
+
+function normaliseApplicationStatus(value) {
+  if (!value) {
+    return "unknown";
+  }
+
+  const status = normaliseText(value);
+
+  if (
+    status.includes("rolling")
+  ) {
+    return "rolling";
+  }
+
+  if (
+    status.includes("upcoming") ||
+    status.includes("not yet open") ||
+    status.includes("opens soon") ||
+    status.includes("announced")
+  ) {
+    return "upcoming";
+  }
+
+  if (
+    status.includes("closed") ||
+    status.includes("expired") ||
+    status.includes("passed")
+  ) {
+    return "closed";
+  }
+
+  if (
+    status.includes("open")
+  ) {
+    return "open";
+  }
+
+  if (
+    status.includes("unknown") ||
+    status.includes("not announced") ||
+    status.includes("not stated") ||
+    status.includes("tbc") ||
+    status.includes("awaiting")
+  ) {
+    return "unknown";
+  }
+
+  return "unknown";
+}
+
+function populateFilterOptions() {
+  const locations = uniqueSorted(
+    directoryState.firms.flatMap(
+      firm => firm.locations
+    )
+  );
+
+  const practiceAreas = uniqueSorted(
+    directoryState.firms.flatMap(
+      firm => firm.practiceAreas
+    )
+  );
+
+  const roles = uniqueSorted(
+    directoryState.firms.flatMap(
+      firm => firm.roles
+    )
+  );
+
+  addSelectOptions(
+    directoryElements.location,
+    locations
+  );
+
+  addSelectOptions(
+    directoryElements.practice,
+    practiceAreas
+  );
+
+  addSelectOptions(
+    directoryElements.role,
+    roles
+  );
+}
+
+function addSelectOptions(select, values) {
+  if (!select) {
     return;
   }
 
-  document.title = `${firm.name} — Vacatory`;
+  values.forEach(value => {
+    const option = document.createElement("option");
 
-  const firmLogo = document.getElementById("firmLogo");
-  const firmName = document.getElementById("firmName");
-  const firmType = document.getElementById("firmType");
-  const firmOverview = document.getElementById("firmOverview");
-  const firmMeta = document.getElementById("firmMeta");
+    option.value = value;
+    option.textContent = value;
 
-  if (firmLogo) {
-    firmLogo.innerHTML = firm.logo_url
-      ? `<img src="${escapeHtml(firm.logo_url)}" alt="${escapeHtml(firm.name)} logo">`
-      : escapeHtml((firm.short_name || firm.name || "V").charAt(0).toUpperCase());
-  }
-
-  if (firmName) firmName.textContent = firm.name || "Firm";
-  if (firmType) firmType.textContent = firm.firm_type || "";
-  if (firmOverview) {
-    firmOverview.textContent = firm.overview || "Overview not yet available.";
-  }
-
-  if (firmMeta) {
-    firmMeta.innerHTML = "";
-
-    if (firm.head_office) {
-      firmMeta.innerHTML += metaPill(locationIcon(), firm.head_office);
-    }
-
-    if (firm.uk_rank) {
-      firmMeta.innerHTML += metaPill(rankIcon(), `UK Rank #${firm.uk_rank}`);
-    }
-
-    if (firm.website) {
-      firmMeta.innerHTML += metaPill(linkIcon(), "Website listed");
-    }
-  }
-
-  setText("ov-size", firm.firm_size || "Not yet available");
-  setText("ov-secondments", firm.secondments || "Not yet available");
-  setText("ov-scholarships", firm.scholarships || "Not yet available");
-
-  const links = document.getElementById("ov-links");
-  if (links) {
-    links.innerHTML = "";
-
-    if (firm.website) links.innerHTML += profileLink(firm.website, "Firm website");
-    if (firm.careers_url) links.innerHTML += profileLink(firm.careers_url, "Careers page");
-    if (firm.linkedin) links.innerHTML += profileLink(firm.linkedin, "LinkedIn");
-  }
-
-  setupFavouriteButton();
-
-  document.getElementById("loadingState")?.classList.add("hidden");
-  document.getElementById("profileContent")?.classList.remove("hidden");
-
-  loadPracticeAreas();
-  loadRoles();
-  loadLocations();
-  loadVacationSchemes(firm.careers_url);
-  loadTrainingContracts(firm.careers_url);
+    select.appendChild(option);
+  });
 }
 
-function setupTabs() {
-  const tabs = document.querySelectorAll(".tab-btn");
-  const panels = document.querySelectorAll(".tab-panel");
+function applyDirectoryFilters() {
+  const searchTerm = normaliseText(
+    directoryElements.search?.value || ""
+  );
 
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      const target = tab.dataset.tab;
+  const selectedLocation =
+    directoryElements.location?.value || "";
 
-      tabs.forEach(item => item.classList.remove("active"));
-      panels.forEach(panel => panel.classList.remove("active"));
+  const selectedPractice =
+    directoryElements.practice?.value || "";
 
-      tab.classList.add("active");
+  const selectedRole =
+    directoryElements.role?.value || "";
 
-      const panel = document.getElementById(`tab-${target}`);
-      if (panel) panel.classList.add("active");
+  const selectedStatus =
+    directoryElements.status?.value || "";
+
+  const selectedSort =
+    directoryElements.sort?.value || "rank";
+
+  directoryState.filteredFirms =
+    directoryState.firms.filter(firm => {
+      const searchableText = normaliseText([
+        firm.name,
+        firm.short_name,
+        firm.firm_type,
+        firm.head_office,
+        ...firm.locations,
+        ...firm.practiceAreas,
+        ...firm.roles
+      ]
+        .filter(Boolean)
+        .join(" "));
+
+      const matchesSearch =
+        !searchTerm ||
+        searchableText.includes(searchTerm);
+
+      const matchesLocation =
+        !selectedLocation ||
+        firm.locations.includes(selectedLocation);
+
+      const matchesPractice =
+        !selectedPractice ||
+        firm.practiceAreas.includes(selectedPractice);
+
+      const matchesRole =
+        !selectedRole ||
+        firm.roles.includes(selectedRole);
+
+      const statuses = firm.statuses.length
+        ? firm.statuses
+        : ["unknown"];
+
+      const matchesStatus =
+        !selectedStatus ||
+        statuses.includes(selectedStatus);
+
+      return (
+        matchesSearch &&
+        matchesLocation &&
+        matchesPractice &&
+        matchesRole &&
+        matchesStatus
+      );
     });
+
+  sortFirms(
+    directoryState.filteredFirms,
+    selectedSort
+  );
+
+  renderFirmDirectory();
+}
+
+function sortFirms(firms, sortValue) {
+  firms.sort((first, second) => {
+    const firstName = first.name || "";
+    const secondName = second.name || "";
+
+    if (sortValue === "az") {
+      return firstName.localeCompare(secondName);
+    }
+
+    if (sortValue === "za") {
+      return secondName.localeCompare(firstName);
+    }
+
+    const firstRank = numericRank(first.uk_rank);
+    const secondRank = numericRank(second.uk_rank);
+
+    if (firstRank !== secondRank) {
+      return firstRank - secondRank;
+    }
+
+    return firstName.localeCompare(secondName);
   });
 }
 
-function setupFavouriteButton() {
-  const favBtn = document.getElementById("favouriteBtn");
-  if (!favBtn) return;
-
-  const favourites = getFavourites();
-
-  if (favourites.includes(String(firmId))) {
-    favBtn.classList.add("active");
-  }
-
-  favBtn.addEventListener("click", () => {
-    toggleFavourite(firmId);
-    favBtn.classList.toggle("active");
-  });
-}
-
-async function loadPracticeAreas() {
-  const container = document.getElementById("practiceAreasList");
-  if (!container) return;
-
-  const { data, error } = await client
-    .from("practice_areas")
-    .select("practice_area, description, featured")
-    .eq("firm_id", firmId)
-    .order("featured", { ascending: false })
-    .order("practice_area", { ascending: true });
-
-  if (error || !data || !data.length) {
-    container.innerHTML = "<p class='loading'>No practice areas listed yet.</p>";
+function renderFirmDirectory() {
+  if (!directoryElements.list) {
     return;
   }
 
-  container.innerHTML = data.map(area => `
-    <article class="profile-card">
-      <h3>
-        ${escapeHtml(area.practice_area)}
-        ${area.featured ? '<span class="featured-tag">Featured</span>' : ""}
-      </h3>
-      ${area.description ? `<p>${escapeHtml(area.description)}</p>` : ""}
-    </article>
-  `).join("");
-}
+  directoryElements.error?.classList.add("hidden");
 
-async function loadRoles() {
-  const container = document.getElementById("rolesList");
-  if (!container) return;
+  const total = directoryState.firms.length;
+  const visible = directoryState.filteredFirms.length;
 
-  const { data, error } = await client
-    .from("firm_roles")
-    .select("role_name, confirmed")
-    .eq("firm_id", firmId)
-    .order("role_name", { ascending: true });
+  if (directoryElements.count) {
+    directoryElements.count.textContent =
+      visible === total
+        ? `${total} law firms`
+        : `${visible} of ${total} law firms`;
+  }
 
-  if (error || !data || !data.length) {
-    container.innerHTML = "<p class='loading'>No role data listed yet.</p>";
+  if (!visible) {
+    directoryElements.list.innerHTML = "";
+    directoryElements.empty?.classList.remove("hidden");
     return;
   }
 
-  const uniqueRoles = [...new Set(
-    data
-      .map(role => role.role_name)
-      .filter(Boolean)
-  )].sort((a, b) => a.localeCompare(b));
+  directoryElements.empty?.classList.add("hidden");
 
-  container.innerHTML = `
-    <ul class="simple-role-list">
-      ${uniqueRoles.map(role => `
-        <li>${escapeHtml(role)}</li>
-      `).join("")}
-    </ul>
-  `;
+  directoryElements.list.innerHTML =
+    directoryState.filteredFirms
+      .map(createFirmCard)
+      .join("");
 }
 
-async function loadLocations() {
-  const container = document.getElementById("locationsList");
-  if (!container) return;
+function createFirmCard(firm) {
+  const name = firm.name || "Law firm";
 
-  const { data, error } = await client
-    .from("locations")
-    .select("city, country, office_type, region, offers_vacation_scheme, offers_training_contract")
-    .eq("firm_id", firmId)
-    .order("city", { ascending: true });
+  const initials = (
+    firm.short_name ||
+    name
+  )
+    .trim()
+    .charAt(0)
+    .toUpperCase();
 
-  if (error || !data || !data.length) {
-    container.innerHTML = "<p class='loading'>No locations listed yet.</p>";
-    return;
-  }
+  const logo = firm.logo_url
+    ? `
+      <img
+        src="${escapeHtml(firm.logo_url)}"
+        alt=""
+        loading="lazy"
+      >
+    `
+    : escapeHtml(initials);
 
-  container.innerHTML = data.map(location => `
-    <article class="profile-card">
-      <h3>${escapeHtml(location.city)}${location.country ? `, ${escapeHtml(location.country)}` : ""}</h3>
+  const firmType =
+    firm.firm_type ||
+    "Law firm";
 
-      ${location.office_type || location.region ? `
-        <p>
-          ${escapeHtml(location.office_type || "Office")}
-          ${location.region ? ` — ${escapeHtml(location.region)}` : ""}
-        </p>
-      ` : ""}
+  const location =
+    firm.head_office ||
+    firm.locations[0] ||
+    "Locations being researched";
 
-      <div class="location-tags">
-        ${location.offers_vacation_scheme ? '<span class="status-pill">Vacation scheme</span>' : ""}
-        ${location.offers_training_contract ? '<span class="status-pill">Training contract</span>' : ""}
-      </div>
-    </article>
-  `).join("");
-}
+  const rank = numericRank(firm.uk_rank);
 
-async function loadVacationSchemes(careersUrl) {
-  const container = document.getElementById("vacationSchemesList");
-  if (!container) return;
+  const rankText = Number.isFinite(rank)
+    ? `UK rank #${rank}`
+    : "Ranking not listed";
 
-  const { data, error } = await client
-    .from("vacation_schemes")
-    .select("*")
-    .eq("firm_id", firmId)
-    .order("deadline", { ascending: true });
-
-  if (error || !data || !data.length) {
-    container.innerHTML = careersUrl
-      ? `<p class='loading'>No vacation scheme data listed yet. ${profileLink(careersUrl, "Visit careers page")}</p>`
-      : "<p class='loading'>No vacation scheme data listed yet.</p>";
-    return;
-  }
-
-  container.innerHTML = data.map(scheme => `
-    <article class="profile-card application-card">
-      <h3>${escapeHtml(scheme.scheme_name || "Vacation scheme")}</h3>
-
-      ${scheme.scheme_type || scheme.location ? `
-        <p>${escapeHtml(scheme.scheme_type || "")}${scheme.location ? ` — ${escapeHtml(scheme.location)}` : ""}</p>
-      ` : ""}
-
-      <div class="profile-fact-grid">
-        ${fact("Opens", formatDate(scheme.opens_on))}
-        ${fact("Deadline", formatDate(scheme.deadline))}
-        ${fact("Duration", scheme.duration)}
-        ${fact("Salary", scheme.salary)}
-        ${fact("Status", scheme.status)}
-      </div>
-
-      ${scheme.eligibility ? `
-        <p class="profile-eligibility">
-          <strong>Eligibility:</strong> ${escapeHtml(scheme.eligibility)}
-        </p>
-      ` : ""}
-
-      ${(scheme.application_link || careersUrl) ? profileLink(scheme.application_link || careersUrl, "Apply / more info") : ""}
-    </article>
-  `).join("");
-}
-
-async function loadTrainingContracts(careersUrl) {
-  const container = document.getElementById("trainingContractList");
-  if (!container) return;
-
-  const { data, error } = await client
-    .from("training_contracts")
-    .select("*")
-    .eq("firm_id", firmId)
-    .order("application_deadline", { ascending: true });
-
-  if (error || !data || !data.length) {
-    container.innerHTML = careersUrl
-      ? `<p class='loading'>No training contract data listed yet. ${profileLink(careersUrl, "Visit careers page")}</p>`
-      : "<p class='loading'>No training contract data listed yet.</p>";
-    return;
-  }
-
-  container.innerHTML = data.map(contract => `
-    <article class="profile-card application-card">
-      <h3>Training contract${contract.intake_year ? ` — ${escapeHtml(contract.intake_year)} intake` : ""}</h3>
-
-      ${contract.location ? `<p>${escapeHtml(contract.location)}</p>` : ""}
-
-      <div class="profile-fact-grid">
-        ${fact("Applications open", formatDate(contract.application_open))}
-        ${fact("Deadline", formatDate(contract.application_deadline))}
-        ${fact("Start date", formatDate(contract.start_date))}
-        ${fact("Year 1 salary", formatMoney(contract.salary_first_year))}
-        ${fact("Year 2 salary", formatMoney(contract.salary_second_year))}
-        ${fact("NQ salary", formatMoney(contract.salary_qualification))}
-        ${fact("Seats", contract.seats)}
-        ${fact("Status", contract.status)}
-      </div>
-
-      ${contract.eligibility ? `
-        <p class="profile-eligibility">
-          <strong>Eligibility:</strong> ${escapeHtml(contract.eligibility)}
-        </p>
-      ` : ""}
-
-      ${(contract.application_link || careersUrl) ? profileLink(contract.application_link || careersUrl, "Apply / more info") : ""}
-    </article>
-  `).join("");
-}
-
-function fact(label, value) {
-  if (!value) return "";
+  const primaryStatus =
+    getPrimaryFirmStatus(firm.statuses);
 
   return `
-    <div class="fact">
-      <span class="fact-label">${escapeHtml(label)}</span>
-      <span class="fact-value">${escapeHtml(value)}</span>
-    </div>
-  `;
-}
+    <a
+      class="firm-card"
+      href="firm.html?id=${encodeURIComponent(firm.id)}"
+      aria-label="View ${escapeHtml(name)} profile"
+    >
+      <div class="firm-card-header">
+        <div class="firm-logo" aria-hidden="true">
+          ${logo}
+        </div>
+      </div>
 
-function profileLink(url, label) {
-  if (!url) return "";
+      <h3>${escapeHtml(name)}</h3>
 
-  return `
-    <a href="${escapeHtml(url)}" target="_blank" rel="noopener" class="firm-link profile-external-link">
-      ${escapeHtml(label)}
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path d="M7 17L17 7M7 7h10v10"></path>
-      </svg>
+      <p class="firm-type">
+        ${escapeHtml(firmType)}
+      </p>
+
+      <div class="firm-details">
+        <p class="firm-location">
+          ${escapeHtml(location)}
+        </p>
+
+        <p class="firm-location">
+          ${escapeHtml(rankText)}
+        </p>
+
+        <span class="status-pill">
+          ${escapeHtml(statusLabel(primaryStatus))}
+        </span>
+      </div>
+
+      <span class="firm-link">
+        View firm profile
+        <span aria-hidden="true">→</span>
+      </span>
     </a>
   `;
 }
 
-function metaPill(icon, text) {
-  return `<span class="profile-meta-pill">${icon}${escapeHtml(text)}</span>`;
+function getPrimaryFirmStatus(statuses) {
+  const availableStatuses = statuses?.length
+    ? statuses
+    : ["unknown"];
+
+  const priority = [
+    "open",
+    "rolling",
+    "upcoming",
+    "closed",
+    "unknown"
+  ];
+
+  return priority.find(
+    status => availableStatuses.includes(status)
+  ) || "unknown";
 }
 
-function locationIcon() {
-  return `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"></path>
-      <circle cx="12" cy="10" r="2.4"></circle>
-    </svg>
-  `;
+function statusLabel(status) {
+  const labels = {
+    open: "Applications open",
+    rolling: "Rolling applications",
+    upcoming: "Opening soon",
+    closed: "Applications closed",
+    unknown: "Dates not announced"
+  };
+
+  return labels[status] || labels.unknown;
 }
 
-function rankIcon() {
-  return `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7-5.4-4.7 7.1-.6z"></path>
-    </svg>
-  `;
+function clearDirectoryFilters() {
+  if (directoryElements.search) {
+    directoryElements.search.value = "";
+  }
+
+  if (directoryElements.sort) {
+    directoryElements.sort.value = "rank";
+  }
+
+  if (directoryElements.location) {
+    directoryElements.location.value = "";
+  }
+
+  if (directoryElements.practice) {
+    directoryElements.practice.value = "";
+  }
+
+  if (directoryElements.role) {
+    directoryElements.role.value = "";
+  }
+
+  if (directoryElements.status) {
+    directoryElements.status.value = "";
+  }
+
+  applyDirectoryFilters();
+
+  directoryElements.search?.focus();
 }
 
-function linkIcon() {
-  return `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path d="M10 13a5 5 0 0 0 7.1 0l2.1-2.1a5 5 0 0 0-7.1-7.1L11 4.9"></path>
-      <path d="M14 11a5 5 0 0 0-7.1 0L4.8 13.1a5 5 0 0 0 7.1 7.1L13 19.1"></path>
-    </svg>
-  `;
-}
+function showDirectoryError() {
+  directoryElements.loading?.classList.add("hidden");
+  directoryElements.empty?.classList.add("hidden");
+  directoryElements.error?.classList.remove("hidden");
 
-function setText(id, value) {
-  const element = document.getElementById(id);
-  if (element) element.textContent = value;
-}
-
-function getFavourites() {
-  try {
-    return JSON.parse(localStorage.getItem(favouritesKey)) || [];
-  } catch {
-    return [];
+  if (directoryElements.count) {
+    directoryElements.count.textContent =
+      "The firms directory could not be loaded.";
   }
 }
 
-function toggleFavourite(id) {
-  const firmIdString = String(id);
-  const favourites = getFavourites();
-
-  const updated = favourites.includes(firmIdString)
-    ? favourites.filter(item => item !== firmIdString)
-    : [...favourites, firmIdString];
-
-  localStorage.setItem(favouritesKey, JSON.stringify(updated));
+function uniqueSorted(values) {
+  return [...new Set(
+    values
+      .filter(Boolean)
+      .map(value => String(value).trim())
+      .filter(Boolean)
+  )].sort((first, second) =>
+    first.localeCompare(second)
+  );
 }
 
-function formatDate(value) {
-  if (!value) return "";
+function numericRank(value) {
+  const rank = Number(value);
 
-  const date = new Date(value);
-  if (isNaN(date)) return value;
-
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  });
+  return Number.isFinite(rank)
+    ? rank
+    : Number.POSITIVE_INFINITY;
 }
 
-function formatMoney(value) {
-  if (value === null || value === undefined || value === "") return "";
-
-  const number = Number(value);
-  if (isNaN(number)) return value;
-
-  return `£${number.toLocaleString("en-GB")}`;
+function normaliseText(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
 }
 
 function escapeHtml(value) {
