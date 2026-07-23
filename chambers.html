@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <script>
+    (function () {
+      var savedTheme = localStorage.getItem("vacatory-theme");
+
+      var preferredTheme = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches
+        ? "dark"
+        : "light";
+
+      document.documentElement.dataset.theme =
+        savedTheme || preferredTheme;
+    })();
+  </script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff">
+
+  <title>Barristers’ Chambers — Vacatory</title>
+
+  <meta
+    name="description"
+    content="Explore barristers’ chambers, practice areas, pupillages, mini-pupillages and locations."
+  >
+
+  <link rel="stylesheet" href="styles.css?v=16">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+
+<body>
+  <a class="skip-link" href="#main-content">
+    Skip to content
+  </a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+
+      <a href="index.html" class="brand" aria-label="Vacatory home">
+        <svg
+          class="brand-mark"
+          viewBox="0 0 28 28"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 4 L14 24"
+            class="logo-stroke-left"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+
+          <path
+            d="M24 4 L14 24"
+            class="logo-stroke-right"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+        </svg>
+
+        <span class="brand-word">acatory</span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="firms.html">
+          Firms
+        </a>
+
+        <a
+          href="chambers.html"
+          class="active"
+          aria-current="page"
+        >
+          Chambers
+        </a>
+
+        <a href="deadlines.html">
+          Deadlines
+        </a>
+
+        <a href="commercial-awareness.html">
+          Commercial Awareness
+        </a>
+      </nav>
+
+      <div class="header-actions">
+
+        <button
+          id="mobileMenuToggle"
+          class="mobile-menu-toggle"
+          type="button"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+          aria-controls="mobileNavigation"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16"></path>
+            <path d="M4 12h16"></path>
+            <path d="M4 17h16"></path>
+          </svg>
+        </button>
+
+        <a
+          class="header-search-link"
+          href="#directorySearch"
+          aria-label="Search chambers"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+          </svg>
+        </a>
+
+        <button
+          id="themeToggle"
+          class="theme-toggle"
+          aria-label="Toggle dark mode"
+          type="button"
+        >
+          <svg
+            class="icon-sun"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>
+
+          <svg
+            class="icon-moon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <nav
+    id="mobileNavigation"
+    class="mobile-navigation"
+    aria-label="Mobile navigation"
+    hidden
+  >
+    <a href="firms.html">
+      Firms
+    </a>
+
+    <a href="chambers.html" aria-current="page">
+      Chambers
+    </a>
+
+    <a href="deadlines.html">
+      Deadlines
+    </a>
+
+    <a href="commercial-awareness.html">
+      Commercial Awareness
+    </a>
+  </nav>
+
+  <div class="site-notice" role="status">
+    <div class="container notice-inner">
+      <span class="notice-dot" aria-hidden="true"></span>
+
+      <strong>Site update in progress.</strong>
+
+      <span>
+        Chambers research is being added.
+      </span>
+    </div>
+  </div>
+
+  <main id="main-content">
+
+    <section
+      class="profile-hero"
+      aria-labelledby="page-title"
+    >
+      <div class="container profile-hero-inner">
+
+        <p class="eyebrow">
+          Barrister pathway
+        </p>
+
+        <div class="profile-header-text">
+          <h1 id="page-title">
+            Barristers’ Chambers
+          </h1>
+        </div>
+
+        <p class="profile-overview">
+          Explore chambers, practice areas, circuits, pupillages,
+          mini-pupillages and funding information. Profiles will be
+          added as official-source research is completed.
+        </p>
+
+      </div>
+    </section>
+
+    <section
+      class="search-section"
+      aria-label="Search and filter barristers’ chambers"
+    >
+      <div class="container">
+
+        <div class="search-panel">
+
+          <div class="filter-control">
+            <label for="directorySearch">
+              Search chambers
+            </label>
+
+            <input
+              id="directorySearch"
+              type="search"
+              placeholder="Search by chambers name"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="filter-control">
+            <label for="sortFilter">
+              Sort by
+            </label>
+
+            <select id="sortFilter">
+              <option value="az">
+                Chambers name A–Z
+              </option>
+
+              <option value="za">
+                Chambers name Z–A
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-control">
+            <label for="locationFilter">
+              Location
+            </label>
+
+            <select id="locationFilter">
+              <option value="">
+                All locations
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-control">
+            <label for="circuitFilter">
+              Circuit or region
+            </label>
+
+            <select id="circuitFilter">
+              <option value="">
+                All circuits and regions
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-control">
+            <label for="practiceFilter">
+              Practice area
+            </label>
+
+            <select id="practiceFilter">
+              <option value="">
+                All practice areas
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-control">
+            <label for="opportunityFilter">
+              Opportunity
+            </label>
+
+            <select id="opportunityFilter">
+              <option value="">
+                All opportunities
+              </option>
+
+              <option value="pupillage">
+                Pupillage
+              </option>
+
+              <option value="mini_pupillage">
+                Mini-pupillage
+              </option>
+
+              <option value="assessed_mini_pupillage">
+                Assessed mini-pupillage
+              </option>
+            </select>
+          </div>
+
+          <button
+            id="clearFilters"
+            class="ghost-btn"
+            type="button"
+          >
+            Clear filters
+          </button>
+
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="firms-section"
+      aria-labelledby="chambers-directory-title"
+    >
+      <div class="container">
+
+        <div class="section-heading-row">
+          <div>
+            <h2 id="chambers-directory-title">
+              Chambers directory
+            </h2>
+
+            <p
+              id="directoryCount"
+              class="section-subtitle"
+              aria-live="polite"
+            >
+              Loading chambers…
+            </p>
+          </div>
+        </div>
+
+        <div
+          id="directoryLoading"
+          class="directory-empty"
+          role="status"
+        >
+          <p>
+            Loading chambers…
+          </p>
+
+          <span>
+            Please wait while the directory loads.
+          </span>
+        </div>
+
+        <div
+          id="directoryError"
+          class="directory-empty hidden"
+          role="alert"
+        >
+          <p>
+            Unable to load chambers
+          </p>
+
+          <span>
+            Please refresh the page and try again.
+          </span>
+        </div>
+
+        <div
+          id="directoryEmpty"
+          class="directory-empty hidden"
+        >
+          <p>
+            Chambers profiles are being researched
+          </p>
+
+          <span>
+            Verified profiles will appear here as they are completed.
+          </span>
+        </div>
+
+        <div
+          id="chambersDirectory"
+          class="firms-grid"
+          aria-live="polite"
+        ></div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+
+      <a
+        href="index.html"
+        class="brand small"
+        aria-label="Vacatory home"
+      >
+        <svg
+          class="brand-mark"
+          viewBox="0 0 28 28"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 4 L14 24"
+            class="logo-stroke-left"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+
+          <path
+            d="M24 4 L14 24"
+            class="logo-stroke-right"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            fill="none"
+          ></path>
+        </svg>
+
+        <span class="brand-word">acatory</span>
+      </a>
+
+      <p class="footer-statement">
+        © 2026 Vacatory
+      </p>
+
+      <div class="footer-links">
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script defer src="supabase.js"></script>
+  <script defer src="chambers-directory.js?v=1"></script>
+  <script defer src="theme.js?v=2"></script>
+</body>
+</html>
